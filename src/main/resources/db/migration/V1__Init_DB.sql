@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS post_service.tag
     id bigint NOT NULL,
     tag text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT tag_pkey PRIMARY KEY (id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS post_service.post2tag(
     id bigint NOT NULL,
