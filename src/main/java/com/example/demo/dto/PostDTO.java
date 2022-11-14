@@ -6,8 +6,8 @@ import java.util.Date;
 public class PostDTO {
     private long id;
     private Date time;
-    private long author_id;
+    private long authorId;
     private String title;
-    private String post_text;
-    private boolean is_blocked;
+    private String postText;
+    private boolean isBlocked;
 }
