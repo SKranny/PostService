@@ -20,7 +20,7 @@ public class PostService {
 		return "Spring is here!";
 	}
 
-	@GetMapping("/")
+	@GetMapping("/email")
 	String email() {
 		return feignService.getEmail();
 	}
