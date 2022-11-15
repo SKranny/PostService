@@ -1,13 +1,13 @@
 package com.example.demo.model;
 import lombok.Data;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+
+import javax.persistence.*;
 
 @Data
 @Entity
 public class Post2Tag {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @ManyToMany
     private long postId;
