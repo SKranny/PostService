@@ -9,8 +9,8 @@ public class Post2Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @ManyToMany
+
     private long postId;
-    @ManyToMany
+
     private long tagId;
 }

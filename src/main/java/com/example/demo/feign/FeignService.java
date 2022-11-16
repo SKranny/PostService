@@ -1,10 +1,10 @@
 package com.example.demo.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
-@FeignClient(value = "FeignService", url = "")
+@FeignClient(value = "FeignService", url = "http://localhost:8080/")
 public interface FeignService {
-    @GetMapping("/email")
-    String getEmail();
+    @PostMapping("/login")
+    public LoginResponse login();
 }
