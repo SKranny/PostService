@@ -16,17 +16,17 @@ public class PostController {
     private PostRepository postRepository;
 
     @GetMapping("/posts/{id}")
-    public String get(@PathVariable int id) {
+    public Post get(@PathVariable int id) {
         Optional<Post> optionalTask = postRepository.findById(id);
         if (!optionalTask.isPresent()){
-            return "no post found";
-        } return optionalTask.get().getPostText();
+            return new Post();
+        } return optionalTask.get();
     }
 
     @PostMapping("/posts/")
-    public String post(@RequestBody Post post) {
+    public Post post(@RequestBody Post post) {
         Post newPost = postRepository.save(post);
-        return post.getId() + "saved";
+        return newPost;
     }
 
 
