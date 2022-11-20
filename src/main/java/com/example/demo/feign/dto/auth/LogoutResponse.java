@@ -1,4 +1,4 @@
-package com.example.demo.feign;
+package com.example.demo.feign.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

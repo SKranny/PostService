@@ -1,5 +1,8 @@
-package com.example.demo.feign;
+package com.example.demo.feign.dto.person;
 
+import com.example.demo.feign.dto.location.City;
+import com.example.demo.feign.dto.location.Country;
+import com.example.demo.feign.enums.MessagePermission;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;

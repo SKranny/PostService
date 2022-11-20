@@ -1,4 +1,4 @@
-package com.example.demo.feign;
+package com.example.demo.feign.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +13,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginRequest {
-    @NotBlank
-    @Email
-    private String email;
 
-    @NotBlank
+    private String email;
     private String password;
 }

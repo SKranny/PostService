@@ -1,4 +1,4 @@
-package com.example.demo.feign;
+package com.example.demo.feign.dto.location;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
         "id",
         "title"
 })
-public class City {
+public class Country {
     private Long id;
 
     private String title;
