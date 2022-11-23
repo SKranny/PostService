@@ -10,5 +10,6 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+      default_schema: post_service
 
