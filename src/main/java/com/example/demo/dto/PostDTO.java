@@ -4,10 +4,10 @@ import java.util.Date;
 
 @Data
 public class PostDTO {
-    private long id;
+    private Long id;
     private Date time;
-    private long authorId;
+    private Long authorId;
     private String title;
     private String postText;
-    private boolean isBlocked;
+    private Boolean isBlocked;
 }

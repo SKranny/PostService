@@ -3,7 +3,7 @@ server:
 spring:
   datasource:
     password:
-    username:
+    username: postgres
     url: jdbc:postgresql://localhost:5432/post-service
     driver-class-name: org.postgresql.Driver
   jpa:
@@ -11,4 +11,5 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
     hibernate:
       ddl-auto: update
-
+jwt:
+  secret-code: ${SECRET_KEY}

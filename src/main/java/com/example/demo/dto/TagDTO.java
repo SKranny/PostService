@@ -3,6 +3,6 @@ import lombok.Data;
 
 @Data
 public class TagDTO {
-    private long id;
+    private Long id;
     private String tag;
 }

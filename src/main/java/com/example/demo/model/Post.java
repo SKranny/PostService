@@ -11,10 +11,10 @@ import java.util.Date;
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
     private Date time;
-    private long authorId;
+    private Long authorId;
     private String title;
     private String postText;
-    private boolean isBlocked;
+    private Boolean isBlocked;
 }
