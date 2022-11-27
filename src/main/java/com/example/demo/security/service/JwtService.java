@@ -2,19 +2,20 @@ package com.example.demo.security.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS512;
 
+@Service
+@Slf4j
 public class JwtService {
     @Value("${jwt.secret-code}")
     private String secretKey;
@@ -44,8 +45,8 @@ public class JwtService {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    public Set<String> getRolesFromToken(String token) {
-        return getClaimFromToken(token, (Function<Claims, Set<String>>) claims -> claims.get("roles", Set.class));
+    public List<String> getRolesFromToken(String token) {
+        return getClaimFromToken(token, (Function<Claims, List<String>>) claims -> claims.get("roles", List.class));
     }
 
     public String getEmailFromToken(String token) {
@@ -56,10 +57,15 @@ public class JwtService {
         return claimResolver.apply(getAllClaimsFromToken(token));
     }
 
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser()
+    private Claims getAllClaimsFromToken(String token){
+        try{
+            return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
+
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }

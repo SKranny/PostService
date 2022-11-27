@@ -2,7 +2,6 @@ package com.example.demo.security.filter;
 
 import com.example.demo.security.service.JwtService;
 import com.example.demo.util.security.TokenUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,16 +27,9 @@ public class JwtPerRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String token = TokenUtil.parseToken(request);
-        String userName = null;
 
         if (Optional.ofNullable(token).isPresent()) {
-            try {
-                userName = jwtService.getUserNameFromToken(token);
-            }catch (ExpiredJwtException e){
-                logger.debug("The token is expired");
-            }
-
-            UsernamePasswordAuthenticationToken details = new UsernamePasswordAuthenticationToken(userName, null, jwtService.getRolesFromToken(token).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+            UsernamePasswordAuthenticationToken details = new UsernamePasswordAuthenticationToken(jwtService.getUserNameFromToken(token), null, jwtService.getRolesFromToken(token).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
             SecurityContextHolder.getContext().setAuthentication(details);
         }
 
