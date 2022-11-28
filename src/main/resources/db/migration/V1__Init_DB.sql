@@ -15,12 +15,6 @@ CREATE TABLE IF NOT EXISTS post_service.tag
     CONSTRAINT tag_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS post_service.post2tag(
-    id bigint NOT NULL,
-    post_id bigint NOT NULL,
-    tag_id bigint NOT NULL,
-    CONSTRAINT post2tag_pkey PRIMARY KEY (id)
-);
 
 
 
