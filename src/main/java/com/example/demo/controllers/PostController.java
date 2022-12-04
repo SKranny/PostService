@@ -4,32 +4,65 @@ import com.example.demo.dto.PostDTO;
 import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
 import com.example.demo.repositories.PostRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/posts")
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/post")
 public class PostController {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+    private final PostMapper postMapper;
 
-    private PostMapper postMapper;
-
-    @GetMapping("/posts/{id}")
-    public PostDTO get(@PathVariable long id) {
-        Optional<Post> optionalTask = postRepository.findById(id);
-        if (!optionalTask.isPresent()){
-            return postMapper.toDTO(new Post());
-        } return postMapper.toDTO(optionalTask.get());
+    @GetMapping("{id}")
+    public ResponseEntity get(@PathVariable long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (!optionalPost.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } return new ResponseEntity(postMapper.toDTO(optionalPost.get()), HttpStatus.OK);
     }
 
-    @PostMapping("/posts")
-    public PostDTO post(@RequestBody Post post) {
-        Post newPost = postRepository.save(post);
-        return postMapper.toDTO(newPost);
+    @PutMapping("{id}")
+    public ResponseEntity put(@PathVariable long id){
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (!optionalPost.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } return new ResponseEntity(postMapper.toDTO(optionalPost.get()), HttpStatus.CREATED);
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity delete(@PathVariable long id){
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (!optionalPost.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @GetMapping
+    public ResponseEntity get(){
+        Iterable<Post> postIterable = postRepository.findAll();
+        ArrayList<Post> posts = new ArrayList<>();
+        for (Post post : postIterable){
+            posts.add(post);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+    @PostMapping
+    public ResponseEntity post(){
+        Iterable<Post> postIterable = postRepository.findAll();
+        ArrayList<Post> posts = new ArrayList<>();
+        for (Post post : postIterable){
+            posts.add(post);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
 }
