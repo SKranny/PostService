@@ -13,4 +13,3 @@ spring:
       ddl-auto: update
 jwt:
   secret-code: ${SECRET_KEY}
-  life-time: ${LIFE_TIME}

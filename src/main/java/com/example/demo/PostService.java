@@ -4,8 +4,6 @@ import com.example.demo.feign.AuthService;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.web.bind.annotation.*;
-
 @EnableFeignClients(clients = {AuthService.class})
 @SpringBootApplication
 public class PostService {

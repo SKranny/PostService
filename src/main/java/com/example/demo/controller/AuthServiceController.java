@@ -21,4 +21,5 @@ public class AuthServiceController {
     public String hello(){
         return "securityTest";
     }
+
 }

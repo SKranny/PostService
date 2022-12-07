@@ -20,26 +20,6 @@ public class JwtService {
     @Value("${jwt.secret-code}")
     private String secretKey;
 
-    @Value("${jwt.life-time}")
-    private Long lifeTime;
-
-    public String generateJwtToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        PersonDetails personDetails = (PersonDetails) userDetails;
-
-        claims.put("email", personDetails.getEmail());
-        claims.put("roles", personDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet()));
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(personDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + lifeTime))
-                .signWith(HS512, secretKey)
-                .compact();
-    }
 
     public String getUserNameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);

@@ -100,6 +100,13 @@
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.example</groupId>
+			<artifactId>common-lib</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -109,8 +116,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -120,6 +127,10 @@
 		</plugins>
 	</build>
 
-
-
+	<repositories>
+		<repository>
+			<id>nexus-repo</id>
+			<url>http://localhost:8088/repository/common-lib/</url>
+		</repository>
+	</repositories>
 </project>
