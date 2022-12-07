@@ -127,10 +127,10 @@
 		</plugins>
 	</build>
 
-	<repositories>
+	<distributionManagement>
 		<repository>
-			<id>nexus-repo</id>
+			<id>nexusdeploymentrepo</id>
 			<url>http://localhost:8088/repository/common-lib/</url>
 		</repository>
-	</repositories>
+	</distributionManagement>
 </project>

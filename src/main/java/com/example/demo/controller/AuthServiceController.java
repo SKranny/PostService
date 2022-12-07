@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.feign.AuthService;
-import com.example.demo.feign.dto.auth.LoginRequest;
+import dto.authDto.auth.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

@@ -20,14 +20,13 @@ import java.util.Optional;
 public class PostController {
 
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
 
     @GetMapping("{id}")
     public ResponseEntity get(@PathVariable long id) {
         Optional<Post> optionalPost = postRepository.findById(id);
         if (!optionalPost.isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } return new ResponseEntity(postMapper.toDTO(optionalPost.get()), HttpStatus.OK);
+        } return new ResponseEntity(PostMapper.INSTANCE.toDTO(optionalPost.get()), HttpStatus.OK);
     }
 
     @PutMapping("{id}")
@@ -35,7 +34,7 @@ public class PostController {
         Optional<Post> optionalPost = postRepository.findById(id);
         if (!optionalPost.isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } return new ResponseEntity(postMapper.toDTO(optionalPost.get()), HttpStatus.CREATED);
+        } return new ResponseEntity(PostMapper.INSTANCE.toDTO(optionalPost.get()), HttpStatus.CREATED);
     }
 
     @DeleteMapping("{id}")
