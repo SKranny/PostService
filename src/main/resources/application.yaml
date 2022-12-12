@@ -1,6 +1,8 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8084}
 spring:
+  application:
+    name: post-service
   datasource:
     password: ${DB_PASSWORD}
     username: postgres
@@ -13,3 +15,8 @@ spring:
       ddl-auto: update
 jwt:
   secret-code: ${SECRET_KEY}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8081/eureka}

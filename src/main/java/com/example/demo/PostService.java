@@ -1,11 +1,12 @@
 package com.example.demo;
 
-import com.example.demo.feign.AuthService;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
-@EnableFeignClients(clients = {AuthService.class})
+@EnableFeignClients
+@EnableEurekaClient
 @SpringBootApplication
 public class PostService {
 
