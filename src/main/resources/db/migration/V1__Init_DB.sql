@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS post_service.post(
+CREATE TABLE IF NOT EXISTS post(
     id                          BIGSERIAL NOT NULL,
     "time"                      DATE NOT NULL,
     author_id                   BIGINT NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS post_service.post(
     is_blocked                  BOOLEAN NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS post_service.tag
+CREATE TABLE IF NOT EXISTS tag
 (
     id                         BIGSERIAL NOT NULL,
     tag                        TEXT COLLATE pg_catalog."default" NOT NULL

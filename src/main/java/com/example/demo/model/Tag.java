@@ -2,10 +2,7 @@ package com.example.demo.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -13,9 +10,12 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(name = "tag")
 public class Tag {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tag_id_gen")
+    @SequenceGenerator(name = "tag_id_gen", sequenceName = "tag_id_seq", allocationSize = 1)
+    @Column(name = "id")
     private Long id;
     private String tag;
 }
