@@ -5,7 +5,7 @@ spring:
     name: post-service
   datasource:
     password: ${DB_PASSWORD}
-    username: postgres
+    username: ${USER_NAME}
     url: jdbc:postgresql://localhost:5432/post-service
     driver-class-name: org.postgresql.Driver
   jpa:

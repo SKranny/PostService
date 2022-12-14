@@ -1,7 +1,6 @@
 package com.example.demo.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +9,9 @@ import javax.persistence.Id;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 public class Tag {
     @Id
@@ -17,3 +19,4 @@ public class Tag {
     private Long id;
     private String tag;
 }
+

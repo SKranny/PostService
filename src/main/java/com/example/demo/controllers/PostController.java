@@ -4,6 +4,7 @@ import com.example.demo.dto.PostDTO;
 import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
 import com.example.demo.repositories.PostRepository;
+import com.example.demo.services.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -19,49 +21,34 @@ import java.util.Optional;
 @RequestMapping("/api/v1/post")
 public class PostController {
 
-    private final PostRepository postRepository;
+    private final PostService postService;
 
-    @GetMapping("{id}")
-    public ResponseEntity get(@PathVariable long id) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (!optionalPost.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } return new ResponseEntity(PostMapper.INSTANCE.toDTO(optionalPost.get()), HttpStatus.OK);
+    @GetMapping("/{id}")
+    @ResponseBody
+    public PostDTO getPostById(@PathVariable Long id) {
+        return postService.findById(id);
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity put(@PathVariable long id){
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (!optionalPost.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } return new ResponseEntity(PostMapper.INSTANCE.toDTO(optionalPost.get()), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity editPost(@PathVariable Long id, @RequestParam String title, @RequestParam String text){
+        return postService.editPost(id, title, text);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity delete(@PathVariable long id){
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (!optionalPost.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } return ResponseEntity.status(HttpStatus.OK).body(null);
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Long id){
+        return postService.delete(id);
     }
 
     @GetMapping
-    public ResponseEntity get(){
-        Iterable<Post> postIterable = postRepository.findAll();
-        ArrayList<Post> posts = new ArrayList<>();
-        for (Post post : postIterable){
-            posts.add(post);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+    @ResponseBody
+    public List<PostDTO> getAllPosts(){
+        return postService.getAllPosts();
     }
+
     @PostMapping
-    public ResponseEntity post(){
-        Iterable<Post> postIterable = postRepository.findAll();
-        ArrayList<Post> posts = new ArrayList<>();
-        for (Post post : postIterable){
-            posts.add(post);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    @ResponseBody
+    public ResponseEntity createPost(@RequestParam String title, @RequestParam String text, @RequestParam Long authorId){
+        return postService.createPost(title, text, authorId);
     }
 
 }
