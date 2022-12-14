@@ -4,9 +4,9 @@ import com.example.demo.model.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PostMapper {
-    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
 
     PostDTO toDTO(Post post);
+    Post toPost (PostDTO postDTO);
 }

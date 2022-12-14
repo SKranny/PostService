@@ -8,9 +8,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 @EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
-public class PostService {
+public class PostApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PostService.class, args);
+		SpringApplication.run(PostApplication.class, args);
 	}
 }
