@@ -1,10 +1,12 @@
 package com.example.demo.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 import java.util.Date;
 
 @Data
 @Schema(description = "Сообщение")
+@Builder
 public class PostDTO {
     @Schema(description = "Идентификатор")
     private Long id;
