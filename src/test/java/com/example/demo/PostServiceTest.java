@@ -5,18 +5,15 @@ import com.example.demo.exception.PostException;
 import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
 import com.example.demo.repositories.PostRepository;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,31 +23,31 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class PostServiceTest {
 
+    private final static String DEFAULT_TITLE = "New title";
+    private final static String DEFAULT_TEXT = "New text";
 
     @Mock
     private PostRepository postRepository;
-    @Autowired
-    private PostMapper postMapper;
+    private  PostMapper postMapper;
+    private Post post;
 
-    Post post = Post.builder()
-            .id(1L)
-            .authorId(1L)
-            .title("Some title")
-            .postText("Some text")
-            .isBlocked(false)
-            .build();
-
+    @BeforeEach
+    public void init(){
+        post = Post.builder()
+                .id(1L)
+                .authorId(1L)
+                .title("Some title")
+                .postText("Some text")
+                .isBlocked(false)
+                .build();
+    }
 
     @Test
     public void findByIdTest() {
-
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
-
-        Optional<Post> post = postRepository.findById(1L);
-        if (!post.isPresent()) {
-            throw new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST);
-        }
-        PostDTO postDTO = postMapper.toDTO(post.get());
+        Post post = postRepository.findById(1L).orElseThrow(
+                () -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
+        PostDTO postDTO = postMapper.toDTO(post);
 
         assertNotNull(postDTO);
         assertEquals(1L, postDTO.getId());
@@ -65,27 +62,27 @@ public class PostServiceTest {
 
         when(postRepository.findById(this.post.getId())).thenReturn(Optional.of(post));
 
-        Optional<Post> post = postRepository.findById(1L);
-        if (!post.isPresent()) {
-            throw new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST);
-        }
+        Post post = postRepository.findById(1L).orElseThrow(
+                () -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
 
-        String title = "New title";
-        String text = "New text";
-
-        post.get().setTitle(title);
-        post.get().setPostText(text);
+        post.setTitle(DEFAULT_TITLE);
+        post.setPostText(DEFAULT_TEXT);
         when(postRepository.save(ArgumentMatchers.any(Post.class))).thenReturn(this.post);
 
-        postRepository.save(post.get());
-        PostDTO postDTO = postMapper.toDTO(postRepository.save(post.get()));
+        postRepository.save(post);
+        PostDTO postDTO = postMapper.toDTO(postRepository.save(post));
 
         assertNotNull(postDTO);
         assertEquals(1L, postDTO.getId());
         assertEquals(1L, postDTO.getAuthorId());
-        assertEquals("New title", postDTO.getTitle());
-        assertEquals("New text", postDTO.getPostText());
+        assertEquals(DEFAULT_TITLE, postDTO.getTitle());
+        assertEquals(DEFAULT_TEXT, postDTO.getPostText());
         assertEquals(false, postDTO.getIsBlocked());
+    }
+
+    @Autowired
+    public void setPostMapper(PostMapper postMapper) {
+        this.postMapper = postMapper;
     }
 
 }

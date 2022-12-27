@@ -5,34 +5,41 @@ import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.mapstruct.factory.Mappers;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 
 @SpringBootTest
 public class PostMapperTest {
+    private final static String DEFAULT_TITLE = "New title";
+    private final static String DEFAULT_TEXT = "New text";
 
-    private PostMapper postMapper = Mappers.getMapper(PostMapper.class);
+    private PostMapper postMapper;
+    private Post post;
+    private PostDTO postDTO;
 
-    Post post = Post.builder()
-            .id(1L)
-            .authorId(1L)
-            .title("Some title")
-            .postText("Some text")
-            .isBlocked(false)
-            .build();
+    @BeforeEach
+    public void init(){
+        post = Post.builder()
+                .id(1L)
+                .authorId(1L)
+                .title(DEFAULT_TITLE)
+                .postText(DEFAULT_TEXT)
+                .isBlocked(false)
+                .build();
 
-    PostDTO postDTO = PostDTO.builder()
-            .id(1L)
-            .authorId(1L)
-            .title("Some title")
-            .postText("Some text")
-            .isBlocked(false)
-            .build();
+        postDTO = PostDTO.builder()
+                .id(1L)
+                .authorId(1L)
+                .title(DEFAULT_TITLE)
+                .postText(DEFAULT_TEXT)
+                .isBlocked(false)
+                .build();
+    }
+
     @Test
-   public void mapPostToDtoTest() {
-System.out.println(postMapper);
-
+    public void mapPostToDtoTest() {
         PostDTO postDTO = postMapper.toDTO(post);
 
         Assertions.assertNotNull(postDTO);
@@ -46,7 +53,6 @@ System.out.println(postMapper);
 
     @Test
     public void mapDtoToPostTest() {
-
         Post post = postMapper.toPost(postDTO);
 
         Assertions.assertNotNull(post);
@@ -55,6 +61,11 @@ System.out.println(postMapper);
         Assertions.assertEquals(postDTO.getPostText(), post.getPostText());
         Assertions.assertEquals(postDTO.getIsBlocked(), post.getIsBlocked());
 
+    }
+
+    @Autowired
+    public void setPostMapper(PostMapper postMapper) {
+        this.postMapper = postMapper;
     }
 
 
