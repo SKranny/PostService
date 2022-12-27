@@ -5,23 +5,31 @@ import com.example.demo.mappers.TagMapper;
 import com.example.demo.model.Tag;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class TagMapperTest {
+    private final static String DEFAULT_TAG = "#SomeTag";
 
-    private TagMapper tagMapper = Mappers.getMapper(TagMapper.class);
+    private TagMapper tagMapper;
+    private Tag tag;
+    private TagDTO tagDTO;
 
-    Tag tag = Tag.builder()
-            .id(1L)
-            .tag("#SomeTag")
-            .build();
+    @BeforeEach
+    public void init(){
+        tag = Tag.builder()
+                .id(1L)
+                .tag(DEFAULT_TAG)
+                .build();
 
-    TagDTO tagDTO = TagDTO.builder()
-            .id(1L)
-            .tag("#SomeTag")
-            .build();
+        tagDTO = TagDTO.builder()
+                .id(1L)
+                .tag(DEFAULT_TAG)
+                .build();
+    }
 
     @Test
     public void mapTagToDtoTest() {
@@ -43,5 +51,10 @@ public class TagMapperTest {
         Assertions.assertEquals(tagDTO.getId(), tag.getId());
         Assertions.assertEquals(tagDTO.getTag(), tag.getTag());
 
+    }
+
+    @Autowired
+    public void setTagMapper(TagMapper tagMapper) {
+        this.tagMapper = tagMapper;
     }
 }
