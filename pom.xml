@@ -105,6 +105,12 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.example</groupId>
+			<artifactId>common-lib</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -153,10 +159,17 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<url>http://158.160.6.130:8081/nexus/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
+
 	<distributionManagement>
 		<repository>
-			<id>nexusdeploymentrepo</id>
-			<url>http://localhost:8088/repository/common-lib/</url>
+			<id>nexus</id>
+			<url>http://158.160.6.130:8081/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>
 </project>

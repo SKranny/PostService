@@ -1,8 +1,8 @@
 package com.example.demo;
 
-import com.example.demo.dto.PostDTO;
 import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
+import dto.postDto.PostDTO;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

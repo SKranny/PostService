@@ -1,10 +1,10 @@
 package com.example.demo.services;
 
-import com.example.demo.dto.PostDTO;
 import com.example.demo.exception.PostException;
 import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
 import com.example.demo.repositories.PostRepository;
+import dto.postDto.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
