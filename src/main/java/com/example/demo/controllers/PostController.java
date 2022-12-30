@@ -1,7 +1,7 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.PostDTO;
 import com.example.demo.services.PostService;
+import dto.postDto.PostDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

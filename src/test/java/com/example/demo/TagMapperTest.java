@@ -1,8 +1,8 @@
 package com.example.demo;
 
-import com.example.demo.dto.TagDTO;
 import com.example.demo.mappers.TagMapper;
 import com.example.demo.model.Tag;
+import dto.postDto.TagDTO;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

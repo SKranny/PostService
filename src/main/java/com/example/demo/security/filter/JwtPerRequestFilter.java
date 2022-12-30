@@ -1,6 +1,6 @@
 package com.example.demo.security.filter;
 
-import com.example.demo.security.service.JwtService;
+import com.example.demo.security.filter.service.JwtService;
 import com.example.demo.util.security.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -105,6 +105,21 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.example</groupId>
+			<artifactId>common-lib</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-dynamodb</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -150,13 +165,28 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-bom</artifactId>
+				<version>1.12.372</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<url>http://158.160.6.130:8081/nexus/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
+
 	<distributionManagement>
 		<repository>
-			<id>nexusdeploymentrepo</id>
-			<url>http://localhost:8088/repository/common-lib/</url>
+			<id>nexus</id>
+			<url>http://158.160.6.130:8081/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>
 </project>
