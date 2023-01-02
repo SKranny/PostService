@@ -1,10 +1,6 @@
-FROM maven:3-jdk-8-alpine
+FROM openjdk:11.0-jdk-slim
+WORKDIR /build
+ADD ./target/demo*.jar ./post-service.jar
+EXPOSE 8083
+CMD java -jar post-service.jar
 
-WORKDIR /usr/src/app
-
-COPY . /usr/src/app
-RUN mvn package
-
-ENV PORT 5000
-EXPOSE $PORT
-CMD [ "sh", "-c", "mvn -Dserver.port=${PORT} spring-boot:run" ]
