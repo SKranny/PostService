@@ -30,7 +30,7 @@ build:
         - tags
     script:
         - echo 'Build project'
-        - 'mvn clean compile -Dmaven.test.skip=true -Dmaven.repo.local=./.m2/repository -U'
+        - 'mvn clean compile -Dmaven.test.skip=true -U'
     cache:
         paths:
             - ./target
@@ -43,7 +43,7 @@ package:
     except:
         - tags
     script:
-        - 'mvn $MAVEN_OPTS package -Dmaven.test.skip=true -Dmaven.repo.local=./.m2/repository -U'
+        - 'mvn package -Dmaven.test.skip=true -U'
     artifacts:
         paths:
             - target/*.jar
