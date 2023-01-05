@@ -17,8 +17,6 @@ jwt:
   secret-code: ${SECRET_KEY}
 
 eureka:
-  instance:
-    lease-expiration-duration-in-seconds: 30
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8081/eureka}
