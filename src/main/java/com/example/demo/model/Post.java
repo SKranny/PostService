@@ -1,8 +1,10 @@
 package com.example.demo.model;
 
 import lombok.*;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter

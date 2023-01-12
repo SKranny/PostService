@@ -1,13 +1,12 @@
 package com.example.demo.controllers;
 
+import com.example.demo.feign.PostRequest;
 import com.example.demo.services.PostService;
 import dto.postDto.PostDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,16 +30,15 @@ public class PostController {
 
     @Operation(summary = "Редактирование сообщения по ID")
     @PutMapping("/{id}")
-    public ResponseEntity editPost(@PathVariable @RequestParam @Parameter(description = "заголовок") Long id,
-                                   @RequestParam @Parameter(description = "текст поста") String title,
-                                   @RequestParam @Parameter(description = "ID автора") String text){
-        return postService.editPost(id, title, text);
+    @ResponseBody
+    public PostDTO editPost(@RequestBody @Parameter(description = "Пост")PostRequest postRequest, @PathVariable Long id){
+        return postService.editPost(postRequest, id);
     }
 
     @Operation(summary = "Удаление сообщения по ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Long id){
-        return postService.delete(id);
+    public void delete(@PathVariable Long id){
+        postService.delete(id);
     }
 
     @Operation(summary = "Получить все сообщения")
@@ -53,10 +51,8 @@ public class PostController {
     @Operation(summary = "Создать сообщение")
     @PostMapping
     @ResponseBody
-    public ResponseEntity createPost(@RequestParam @Parameter(description = "заголовок") String title,
-                                     @RequestParam  @Parameter(description = "текст поста") String text,
-                                     @RequestParam @Parameter(description = "ID автора") Long authorId){
-        return postService.createPost(title, text, authorId);
+    public PostDTO createPost(@RequestBody @Parameter(description = "Пост")PostRequest postRequest){
+        return postService.createPost(postRequest);
     }
 
 }
