@@ -4,17 +4,6 @@ cache:
     paths:
         - .m2/repository
 
-services:
-    - name: docker:dind
-      alias: dockerdaemon
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
-
-variables:
-    DOCKER_HOST: tcp://dockerdaemon:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-
 stages:
     - build
     - package
@@ -53,7 +42,7 @@ package:
             - ./.m2
 
 build_and_push_image:
-    image: docker:latest
+    image: docker:stable
     stage: build and push image
     only:
         - develop

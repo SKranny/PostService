@@ -1,5 +1,6 @@
 server:
   port: ${SERVER_PORT:8085}
+
 spring:
   application:
     name: post-service
@@ -11,6 +12,7 @@ spring:
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+
 jwt:
   secret-code: ${SECRET_KEY}
 
