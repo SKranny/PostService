@@ -8,13 +8,10 @@ import com.example.demo.repositories.PostRepository;
 import dto.postDto.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,6 +64,14 @@ public class PostService {
         post.setIsBlocked(false);
         postRepository.save(post);
         return postMapper.toDTO(post);
+    }
+
+    public List<PostDTO> getAllPostsByMe(){
+        return postRepository
+                .findAll()
+                .stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 }
