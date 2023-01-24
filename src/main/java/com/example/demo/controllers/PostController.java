@@ -54,7 +54,7 @@ public class PostController {
     public PostDTO createPost(@RequestBody @Parameter(description = "Пост")PostRequest postRequest){
         return postService.createPost(postRequest);
     }
-    @Operation(summary = "Получение сообщения своих сообщений")
+    @Operation(summary = "Получение списка своих сообщений")
     @GetMapping("/me")
     @ResponseBody
     public List<PostDTO> getAllPostByMe() {

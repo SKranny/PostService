@@ -8,6 +8,8 @@ import com.example.demo.repositories.PostRepository;
 import dto.postDto.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -67,6 +69,9 @@ public class PostService {
     }
 
     public List<PostDTO> getAllPostsByMe(){
+        SecurityContext name = SecurityContextHolder.getContext();
+                SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(name);
         return postRepository
                 .findAll()
                 .stream()
