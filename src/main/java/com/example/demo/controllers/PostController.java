@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -57,7 +58,7 @@ public class PostController {
     @Operation(summary = "Получение списка своих сообщений")
     @GetMapping("/me")
     @ResponseBody
-    public List<PostDTO> getAllPostByMe() {
-        return postService.getAllPostsByMe();
+    public List<PostDTO> getAllPostByUser(Principal principal) {
+        return postService.getAllPostsByUser(principal.getName());
     }
 }
