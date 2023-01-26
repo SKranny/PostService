@@ -8,13 +8,11 @@ import com.example.demo.repositories.PostRepository;
 import dto.postDto.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import java.time.LocalDateTime;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,15 +42,14 @@ public class PostService {
     }
 
     public void delete(Long id){
-        Post post = postRepository
-                .findById(id)
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
         postRepository.delete(post);
     }
 
     public List<PostDTO> getAllPosts(){
         return postRepository
-                .findAll()
+                .findAllByOrderByTimeDesc()
                 .stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
@@ -63,7 +60,7 @@ public class PostService {
         post.setTitle(postRequest.getTitle());
         post.setPostText(postRequest.getText());
         post.setAuthorId(postRequest.getAuthorId());
-        post.setTime(new Date());
+        post.setTime(LocalDateTime.now());
         post.setIsBlocked(false);
         postRepository.save(post);
         return postMapper.toDTO(post);
