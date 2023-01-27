@@ -45,15 +45,14 @@ public class PostService {
     }
 
     public void delete(Long id){
-        Post post = postRepository
-                .findById(id)
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
         postRepository.delete(post);
     }
 
     public List<PostDTO> getAllPosts(){
         return postRepository
-                .findAll()
+                .findAllByOrderByTimeDesc()
                 .stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
@@ -64,7 +63,7 @@ public class PostService {
         post.setTitle(postRequest.getTitle());
         post.setPostText(postRequest.getText());
         post.setAuthorId(postRequest.getAuthorId());
-        post.setTime(new Date());
+        post.setTime(LocalDateTime.now());
         post.setIsBlocked(false);
         postRepository.save(post);
         return postMapper.toDTO(post);
