@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-
 @Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/post")
 @Tag(name="Post Service", description="Сервис работы с постами")
@@ -24,14 +24,12 @@ public class PostController {
 
     @Operation(summary = "Получение сообщения по ID")
     @GetMapping("/{id}")
-    @ResponseBody
     public PostDTO getPostById(@PathVariable Long id) {
         return postService.findById(id);
     }
 
     @Operation(summary = "Редактирование сообщения по ID")
     @PutMapping("/{id}")
-    @ResponseBody
     public PostDTO editPost(@RequestBody @Parameter(description = "Пост")PostRequest postRequest, @PathVariable Long id){
         return postService.editPost(postRequest, id);
     }
@@ -44,20 +42,17 @@ public class PostController {
 
     @Operation(summary = "Получить все сообщения")
     @GetMapping
-    @ResponseBody
     public List<PostDTO> getAllPosts(){
         return postService.getAllPosts();
     }
 
     @Operation(summary = "Создать сообщение")
     @PostMapping
-    @ResponseBody
     public PostDTO createPost(@RequestBody @Parameter(description = "Пост")PostRequest postRequest){
         return postService.createPost(postRequest);
     }
     @Operation(summary = "Получение списка своих сообщений")
     @GetMapping("/me")
-    @ResponseBody
     public List<PostDTO> getAllPostByUser(Principal principal) {
         return postService.getAllPostsByUser(principal.getName());
     }

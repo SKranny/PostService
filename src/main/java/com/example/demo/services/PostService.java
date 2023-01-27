@@ -9,7 +9,6 @@ import com.example.demo.repositories.PostRepository;
 import dto.postDto.PostDTO;
 import dto.userDto.PersonDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
 
-    @Autowired
-    PersonService personService;
-
+    private final PersonService personService;
     private final PostRepository postRepository;
     private final PostMapper postMapper;
 
