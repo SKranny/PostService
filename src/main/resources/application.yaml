@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: post-service
+  kafka:
+    consumer:
+      group-id: post-service-id
+    bootstrap-servers: ${KAFKA_HOST:localhost:9092}
   datasource:
     password: ${DB_PASSWORD}
     username: ${USER_NAME}
