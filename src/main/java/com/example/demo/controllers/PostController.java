@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import security.TokenAuthentication;
 
-import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -55,7 +55,7 @@ public class PostController {
     }
     @Operation(summary = "Получение списка своих сообщений")
     @GetMapping("/me")
-    public List<PostDTO> getAllPostByUser(Principal principal) {
-        return postService.getAllPostsByUser(principal.getName());
+    public List<PostDTO> getAllPostByUser(TokenAuthentication authentication) {
+        return postService.getAllPostsByUser(authentication.getTokenData().getEmail());
     }
 }
