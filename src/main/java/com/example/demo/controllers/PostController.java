@@ -58,4 +58,9 @@ public class PostController {
     public List<PostDTO> getAllPostByUser(TokenAuthentication authentication) {
         return postService.getAllPostsByUser(authentication.getTokenData().getEmail());
     }
+    @Operation(summary = "Получение списка всех сообщений юзера по id")
+    @GetMapping("/user/{id}")
+    public List<PostDTO> getAllPostByUserId(@PathVariable Long id) {
+        return postService.getAllPostsByUserId(id);
+    }
 }

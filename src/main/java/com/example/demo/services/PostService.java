@@ -78,5 +78,12 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    public List<PostDTO> getAllPostsByUserId(Long id) {
+        return postRepository.findAll()
+                .stream()
+                .filter(i -> Objects.equals(i.getAuthorId(), id))
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }
 
