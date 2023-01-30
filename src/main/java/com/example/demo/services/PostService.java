@@ -83,8 +83,8 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public List<PostDTO> getAllFriendsNews(TokenAuthentication authentication){
-        List<Long> friendsIds = friendService.getFriendId(authentication);
+    public List<PostDTO> getAllFriendsNews(){
+        List<Long> friendsIds = friendService.getFriendId();
         List<Post> posts = new ArrayList<>();
         friendsIds.stream().map(id -> posts.addAll(postRepository.findAllPostByAuthorId(id)));
         return posts.stream()

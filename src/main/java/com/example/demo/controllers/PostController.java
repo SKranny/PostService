@@ -62,8 +62,8 @@ public class PostController {
     @Operation(summary = "Получить все новости друзей")
     @GetMapping("/news/friends")
     @ResponseBody
-    public List<PostDTO> getAllFriendsNews(TokenAuthentication authentication){
-        return postService.getAllFriendsNews(authentication);
+    public List<PostDTO> getAllFriendsNews(){
+        return postService.getAllFriendsNews();
     }
 
 }

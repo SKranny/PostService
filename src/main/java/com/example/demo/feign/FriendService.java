@@ -9,6 +9,6 @@ import java.util.List;
 @FeignClient("friend-service/api/v1/friends")
 public interface FriendService {
     @GetMapping("/ids")
-    List<Long> getFriendId(@RequestParam TokenAuthentication authentication);
+    List<Long> getFriendId();
 }
 
