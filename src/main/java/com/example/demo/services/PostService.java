@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.exception.PostException;
+import com.example.demo.feign.FriendService;
 import com.example.demo.feign.PersonService;
 import com.example.demo.feign.PostRequest;
 import com.example.demo.mappers.PostMapper;
@@ -11,8 +12,11 @@ import dto.userDto.PersonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import security.TokenAuthentication;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,6 +28,7 @@ public class PostService {
     private final PersonService personService;
     private final PostRepository postRepository;
     private final PostMapper postMapper;
+    private final FriendService friendService;
 
     public PostDTO findById(Long id) {
         return postRepository
@@ -74,6 +79,15 @@ public class PostService {
         return postRepository.findAll()
                 .stream()
                 .filter(i -> Objects.equals(i.getAuthorId(), personDTO.getId()))
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getAllFriendsNews(TokenAuthentication authentication){
+        List<Long> friendsIds = friendService.getFriendId(authentication);
+        List<Post> posts = new ArrayList<>();
+        friendsIds.stream().map(id -> posts.addAll(postRepository.findAllPostByAuthorId(id)));
+        return posts.stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
     }

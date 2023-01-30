@@ -58,4 +58,12 @@ public class PostController {
     public List<PostDTO> getAllPostByUser(TokenAuthentication authentication) {
         return postService.getAllPostsByUser(authentication.getTokenData().getEmail());
     }
+
+    @Operation(summary = "Получить все новости друзей")
+    @GetMapping("/news/friends")
+    @ResponseBody
+    public List<PostDTO> getAllFriendsNews(TokenAuthentication authentication){
+        return postService.getAllFriendsNews(authentication);
+    }
+
 }
