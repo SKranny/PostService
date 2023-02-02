@@ -8,10 +8,10 @@ import com.example.demo.model.Post;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.specifications.PostSpecification;
 import dto.postDto.PostDTO;
-import dto.userDto.PersonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,21 +91,8 @@ public class PostService {
         return postMapper.toDTO(post);
     }
 
-    public List<PostDTO> getAllPostsByUser(String email){
-        PersonDTO personDTO = personService.getPersonDTOByEmail(email);
-        return postRepository.findAll()
-                .stream()
-                .filter(i -> Objects.equals(i.getAuthorId(), personDTO.getId()))
-                .map(postMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<PostDTO> getAllPostsByUserId(Long id) {
-        return postRepository.findAll()
-                .stream()
-                .filter(i -> Objects.equals(i.getAuthorId(), id))
-                .map(postMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<Post> getAllPostsByUser(String email, Pageable pageable){
+        return postRepository.findPostsByAuthorId(personService.getPersonDTOByEmail(email).getId(),pageable);
     }
 }
 
