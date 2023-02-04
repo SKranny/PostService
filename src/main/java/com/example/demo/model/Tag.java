@@ -1,8 +1,10 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,5 +20,9 @@ public class Tag {
     @Column(name = "id")
     private Long id;
     private String tag;
+
+    @ManyToMany(mappedBy = "tagSet")
+    @JsonIgnore
+    Set<Post> posts;
 }
 
