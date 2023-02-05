@@ -87,6 +87,7 @@ public class PostService {
         post.setAuthorId(postRequest.getAuthorId());
         post.setTime(LocalDateTime.now());
         post.setIsBlocked(false);
+        post.setTagSet(postRequest.getTagSet());
         postRepository.save(post);
         return postMapper.toDTO(post);
     }
