@@ -16,6 +16,8 @@ spring:
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    hibernate:
+      ddl-auto: none
 
 jwt:
   secret-code: ${SECRET_KEY}
