@@ -24,7 +24,9 @@ public class Post {
     private String postText;
     private Boolean isBlocked;
 
+    @Column(name = "with_friends")
     private Boolean withFriends;
+    @Column(name = "is_delete")
     private Boolean isDelete;
 
 
