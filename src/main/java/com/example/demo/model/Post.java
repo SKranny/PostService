@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import lombok.*;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -23,7 +24,6 @@ public class Post {
     private String title;
     private String postText;
     private Boolean isBlocked;
-
     private Boolean withFriends;
     private Boolean isDelete;
 

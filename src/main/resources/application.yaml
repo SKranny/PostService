@@ -11,7 +11,7 @@ spring:
   datasource:
     password: ${DB_PASSWORD}
     username: ${USER_NAME}
-    url: ${POST_SERVICE_DATABASE_URL:jdbc:postgresql://localhost:5432/post-service}
+    url: ${POST_SERVICE_DATABASE_URL:jdbc:postgresql://localhost:5432/post_service}
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
