@@ -15,6 +15,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     List<Post> findAllByOrderByTimeDesc();
 
+    List<Post> findAllPostByAuthorId(Long id);
+
     @Query("SELECT p FROM Post p WHERE p.authorId IN (:author_id)")
     List<Post> findPostsByAuthorId(@Param("author_id") Long author_id, Pageable pageable);
 
