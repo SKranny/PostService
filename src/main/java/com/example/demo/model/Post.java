@@ -1,8 +1,10 @@
 package com.example.demo.model;
 
 import lombok.*;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,5 +24,19 @@ public class Post {
     private String title;
     private String postText;
     private Boolean isBlocked;
+    private Boolean withFriends;
+    private Boolean isDelete;
+
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            })
+    @JoinTable(name = "post_tags",
+            joinColumns = {@JoinColumn(name = "post_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
+    Set<Tag> tagSet;
+
 }
 
