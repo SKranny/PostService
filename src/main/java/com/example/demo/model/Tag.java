@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,10 +18,10 @@ public class Tag {
     @SequenceGenerator(name = "tag_id_gen", sequenceName = "tag_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
+
     private String tag;
 
-    @ManyToMany(mappedBy = "tagSet")
-    @JsonIgnore
-    Set<Post> posts;
+    @ManyToMany(mappedBy = "tags")
+    private Set<Post> posts;
 }
 

@@ -1,5 +1,0 @@
-ALTER TABLE post
-    ADD COLUMN is_delete BOOLEAN NOT NULL DEFAULT false,
-    ADD COLUMN with_friends BOOLEAN NOT NULL DEFAULT false;
-
-

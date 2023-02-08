@@ -1,5 +1,0 @@
-ALTER TABLE post
-    ADD CONSTRAINT pk_post_id PRIMARY KEY(id);
-
-ALTER TABLE tag
-    ADD CONSTRAINT pk_tag_id PRIMARY KEY(id);
