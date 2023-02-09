@@ -21,6 +21,7 @@ import security.dto.TokenData;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,8 +59,10 @@ public class PostService {
         post.setPostText(req.getPostText());
         post.setIsBlocked(req.getIsBlocked());
         post.setWithFriends(req.getWithFriends());
-        updateTags(req.getUpdateReqs(), post);
 
+        if (Optional.ofNullable(req.getUpdateTagsRequests()).isPresent()) {
+            updateTags(req.getUpdateTagsRequests(), post);
+        }
         return postMapper.toDTO(postRepository.save(post));
     }
 

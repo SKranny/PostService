@@ -25,7 +25,7 @@ public class UpdatePostRequest {
     @NotBlank
     private String postText;
 
-    private List<UpdateTagRequest> updateReqs;
+    private List<UpdateTagRequest> updateTagsRequests;
 
     @Builder.Default
     private Boolean withFriends = false;
