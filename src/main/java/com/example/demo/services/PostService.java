@@ -20,6 +20,7 @@ import security.dto.TokenData;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,13 +57,16 @@ public class PostService {
         Post post = findPostById(req.getPostId(), tokenData.getId());
 
         post.setTitle(req.getTitle());
-        post.setPostText(req.getPostText());
+        post.setPostText(req.getText());
         post.setIsBlocked(req.getIsBlocked());
         post.setWithFriends(req.getWithFriends());
 
         if (Optional.ofNullable(req.getUpdateTagsRequests()).isPresent()) {
             updateTags(req.getUpdateTagsRequests(), post);
+        } else {
+            post.setTags(new HashSet<>());
         }
+
         return postMapper.toDTO(postRepository.save(post));
     }
 

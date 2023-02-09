@@ -23,7 +23,7 @@ public class UpdatePostRequest {
     private String title;
 
     @NotBlank
-    private String postText;
+    private String text;
 
     private List<UpdateTagRequest> updateTagsRequests;
 
