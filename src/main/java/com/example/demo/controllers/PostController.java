@@ -29,7 +29,7 @@ public class PostController {
 
     @PutMapping
     @Operation(summary = "Редактирование постов по ID")
-    public PostDTO editPost(@RequestBody UpdatePostRequest req, TokenAuthentication authentication) {
+    public PostDTO editPost(@Valid @RequestBody UpdatePostRequest req, TokenAuthentication authentication) {
         return postService.editPost(req, authentication.getTokenData());
     }
 
@@ -47,7 +47,7 @@ public class PostController {
 
     @Operation(summary = "Создать сообщение")
     @PostMapping
-    public void createPost(@RequestBody @Parameter(description = "Пост") CreatePostRequest createPostRequest,
+    public void createPost(@Valid @RequestBody @Parameter(description = "Пост") CreatePostRequest createPostRequest,
                            TokenAuthentication authentication) {
         postService.createPost(createPostRequest, authentication.getTokenData());
     }
