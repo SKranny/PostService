@@ -25,8 +25,8 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PersonService personService;
-    private final PostRepository postRepository;
     private final CommentMapper commentMapper;
+    private final PostRepository postRepository;
 
     public CommentDTO addComment(Long postId, CommentRequest commentRequest, String userEmail){
         PersonDTO user = personService.getPersonDTOByEmail(userEmail);
@@ -38,43 +38,36 @@ public class CommentService {
                 .likeAmount(0L)
                 .myLike(false)
                 .text(commentRequest.getText())
-                .postId(postId)
+                .post(postRepository.findById(postId).get())
                 .time(time)
                 .imagepath("")
                 .build();
         Post post = postRepository.findById(postId)
-                .map(p -> {
-                    p.setCommentId(comment.getId());
-                    p.setCommentsCount((commentRepository.getCommentsCount() + 1));
-                    return p;
-                })
-                .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new PostException("Post with the id doesn't exist"));
         postRepository.save(post);
         commentRepository.save(comment);
         return commentMapper.toDTO(comment);
     }
 
+
     public void editComment(Long postId, Long commentId, CommentRequest commentRequest, Long id){
         LocalDateTime time = LocalDateTime.now();
         Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
-                .map(c -> {
-                    c.setText(commentRequest.getText());
-                    c.setEditTime(time);
-                    return c;
-                })
+                .map(c -> editComment(c, commentRequest.getText(), time))
                 .orElseThrow(() -> new CommentException("Comment with the id doesn't exist", HttpStatus.BAD_REQUEST));
         commentRepository.save(comment);
+    }
+    private Comment editComment(Comment comment, String text, LocalDateTime time){
+        comment.setText(text);
+        comment.setEditTime(time);
+        return comment;
     }
 
     public void deleteComment(Long postId, Long commentId){
         Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
-                .orElseThrow(() -> new CommentException("Comment with the id doesn't exist", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new CommentException("Comment with the id doesn't exist"));
         Post post = postRepository.findById(postId)
-                .map(p -> {
-                    p.setCommentsCount((commentRepository.getCommentsCount() - 1));
-                    return p;
-                })
-                .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new PostException("Post with the id doesn't exist"));
         commentRepository.delete(comment);
     }
 
@@ -87,3 +80,4 @@ public class CommentService {
     }
 
 }
+

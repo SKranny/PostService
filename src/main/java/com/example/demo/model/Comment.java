@@ -17,8 +17,9 @@ public class Comment {
     @SequenceGenerator(name = "comments_id_gen", sequenceName = "comments_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
-    @Column(name = "post_id")
-    private Long postId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="post_id", nullable=false)
+    private Post post;
     private LocalDateTime time;
     @Column(name = "edit_time")
     private LocalDateTime editTime;
@@ -30,5 +31,6 @@ public class Comment {
     private boolean myLike;
     private String imagepath;
 }
+
 
 

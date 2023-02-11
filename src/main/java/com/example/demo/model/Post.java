@@ -35,10 +35,6 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private PostType type;
 
-    private Long commentId;
-
-    private Long commentsCount;
-
     @Builder.Default
     private Boolean isBlocked = false;
 
@@ -55,5 +51,7 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
     private Set<Tag> tags = new HashSet<>();
 
+    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
+    private Set<Comment> comments;
 }
 
