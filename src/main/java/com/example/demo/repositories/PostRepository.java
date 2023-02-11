@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -32,4 +33,9 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
                 .and(PostSpecification.fromTime(Optional.ofNullable(fromTime).orElse(LocalDateTime.now().minusYears(1))));
         return this.findAll(specification, pageable);
     }
+    List<Post> findAllByOrderByTimeDesc();
+
+    @Query("SELECT p FROM Post p WHERE p.authorId IN (:author_id)")
+    List<Post> findPostsByAuthorId(@Param("author_id") Long author_id, Pageable pageable);
+
 }

@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.constants.PostType;
 import com.example.demo.dto.post.UpdatePostRequest;
 import com.example.demo.dto.tag.UpdateTagRequest;
 import com.example.demo.exception.PostException;
@@ -80,11 +81,14 @@ public class PostService {
     }
 
     public void createPost(CreatePostRequest req, TokenData tokenData){
+        PostType postType = req.getPublishTime() == null? PostType.POSTED : PostType.SCHEDULED;
         Post post = Post.builder()
                 .title(req.getTitle())
                 .postText(req.getText())
                 .authorId(tokenData.getId())
                 .time(LocalDateTime.now())
+                .type(postType)
+                .publishTime(req.getPublishTime())
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
         postRepository.save(post);

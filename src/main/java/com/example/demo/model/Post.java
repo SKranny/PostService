@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.example.demo.constants.PostType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,11 +24,20 @@ public class Post {
 
     private LocalDateTime time;
 
+    private LocalDateTime publishTime;
+
     private Long authorId;
 
     private String title;
 
     private String postText;
+
+    @Enumerated(EnumType.STRING)
+    private PostType type;
+
+    private Long commentId;
+
+    private Long commentsCount;
 
     @Builder.Default
     private Boolean isBlocked = false;
