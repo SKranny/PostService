@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.constants.PostType;
 import com.example.demo.dto.post.UpdatePostRequest;
 import com.example.demo.dto.tag.UpdateTagRequest;
 import com.example.demo.exception.PostException;
@@ -12,6 +13,7 @@ import com.example.demo.model.Tag;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.TagRepository;
 import dto.postDto.PostDTO;
+import dto.userDto.PersonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -31,11 +33,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
     private final PersonService personService;
-
     private final PostRepository postRepository;
-
     private final TagRepository tagRepository;
-
     private final PostMapper postMapper;
     private final FriendService friendService;
 
@@ -54,8 +53,8 @@ public class PostService {
     }
 
     public PostDTO editPost(UpdatePostRequest req, TokenData tokenData){
-        Post post = findPostById(req.getPostId(), tokenData.getId());
-
+        PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
+        Post post = postRepository.findByIdAndAuthorId(req.getPostId(), user.getId()).get();
         post.setTitle(req.getTitle());
         post.setPostText(req.getText());
         post.setIsBlocked(req.getIsBlocked());
@@ -80,11 +79,17 @@ public class PostService {
     }
 
     public void createPost(CreatePostRequest req, TokenData tokenData){
+        LocalDateTime time = LocalDateTime.now();
+        PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time)?
+                PostType.POSTED : PostType.SCHEDULED;
+        PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
         Post post = Post.builder()
                 .title(req.getTitle())
                 .postText(req.getText())
-                .authorId(tokenData.getId())
-                .time(LocalDateTime.now())
+                .authorId(user.getId())
+                .time(time)
+                .type(postType)
+                .publishTime(req.getPublishTime())
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
         postRepository.save(post);
@@ -95,17 +100,36 @@ public class PostService {
     }
 
     public Page<PostDTO> getAllPostsByUser(Long id, Pageable pageable) {
-        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseOrderByTimeDesc(id, pageable).get()
-                .map(postMapper::toDTO)
+        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id,LocalDateTime.now(), pageable).get()
+                .map(post -> {
+                    if (post.getType() == PostType.SCHEDULED) {
+                        setTypePosted(post);
+                    }
+                    PostDTO postDTO = postMapper.toDTO(post);
+                    return postDTO;
+                })
                 .collect(Collectors.toList());
         return new PageImpl<>(posts);
+    }
+    private Post setTypePosted(Post post){
+        post.setType(PostType.POSTED);
+        postRepository.save(post);
+        return post;
     }
 
     public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
                                       Boolean isDelete, Integer page, Integer offset) {
         Pageable pageable = PageRequest.of(page, offset, Sort.by("time").descending());
-        List<PostDTO> posts = postRepository.findAllByFilter(withFriends, isDelete, toTime, fromTime, pageable).get()
-                .map(postMapper::toDTO)
+
+        List<PostDTO> posts = postRepository.findAllByFilter(withFriends,
+                        isDelete, LocalDateTime.now(), toTime, fromTime, pageable).get()
+                .map(post -> {
+                    if (post.getType() == PostType.SCHEDULED) {
+                        setTypePosted(post);
+                    }
+                    PostDTO postDTO = postMapper.toDTO(post);
+                    return postDTO;
+                })
                 .collect(Collectors.toList());
         return new PageImpl<>(posts);
     }
@@ -143,6 +167,7 @@ public class PostService {
         return postRepository.findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(friendsIds, pageable).stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
+
     }
 
 }

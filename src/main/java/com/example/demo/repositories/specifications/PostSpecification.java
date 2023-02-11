@@ -13,6 +13,10 @@ public class PostSpecification {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("withFriends"), withFriends);
     }
 
+    public static Specification<Post> postedPost(LocalDateTime now) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("publishTime"), now);
+    }
+
 
     public static Specification<Post> isDeletePost(Boolean isDelete) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("isDelete"), isDelete);
