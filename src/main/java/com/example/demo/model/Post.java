@@ -45,6 +45,10 @@ public class Post {
     private Boolean isDelete = false;
 
     @Builder.Default
+    private Boolean myLike = false;
+
+
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "jt_post_tag",
             joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
@@ -53,5 +57,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
     private Set<Comment> comments;
+
+    @ManyToMany(mappedBy = "posts")
+    private Set<PostLike> postLikes = new HashSet<>();
+
 }
 

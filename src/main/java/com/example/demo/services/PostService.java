@@ -9,7 +9,9 @@ import com.example.demo.feign.PersonService;
 import com.example.demo.dto.post.CreatePostRequest;
 import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
+import com.example.demo.model.PostLike;
 import com.example.demo.model.Tag;
+import com.example.demo.repositories.PostLikeRepository;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.TagRepository;
 import dto.postDto.PostDTO;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import security.TokenAuthentication;
 import security.dto.TokenData;
 
 import javax.transaction.Transactional;
@@ -37,6 +40,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostMapper postMapper;
     private final FriendService friendService;
+    private final PostLikeRepository postLikeRepository;
 
     public Post findPostById(Long postId, Long personId) {
         return postRepository.findByIdAndAuthorId(postId, personId)
@@ -167,6 +171,29 @@ public class PostService {
         return postRepository.findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(friendsIds, pageable).stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
+
+    }
+
+    public void likePost(Long postId, TokenAuthentication authentication){
+        Post post = postRepository.findById(postId).get();
+        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+        post.setMyLike(post.getAuthorId() == personDTO.getId());
+        postRepository.save(post);
+        PostLike postLike = new PostLike();
+        postLike.setPosts(post);
+        postLikeRepository.save(postLike);
+    }
+
+    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
+        Post post = postRepository.findById(postId).get();
+        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+        if (post.getAuthorId() == personDTO.getId()){
+            post.setMyLike(false);
+            postRepository.save(post);
+        }
+        PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).get();
+        postLikeRepository.delete(postLike);
+
 
     }
 
