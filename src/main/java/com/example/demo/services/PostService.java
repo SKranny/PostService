@@ -174,28 +174,25 @@ public class PostService {
 
     }
 
-    public void likePost(Long postId, TokenAuthentication authentication){
-        Post post = postRepository.findById(postId).get();
-        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
-        post.setMyLike(post.getAuthorId() == personDTO.getId());
-        postRepository.save(post);
-        PostLike postLike = new PostLike();
-        postLike.setPosts(post);
-        postLikeRepository.save(postLike);
-    }
-
-    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
-        Post post = postRepository.findById(postId).get();
-        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
-        if (post.getAuthorId() == personDTO.getId()){
-            post.setMyLike(false);
-            postRepository.save(post);
-        }
-        PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).get();
-        postLikeRepository.delete(postLike);
-
-
-    }
+//    public void likePost(Long postId, TokenAuthentication authentication){
+//        Post post = postRepository.findById(postId).get();
+//        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+//        post.setMyLike(post.getAuthorId() == personDTO.getId());
+//        postRepository.save(post);
+//        PostLike postLike = new PostLike();
+//        postLike.setPosts(post);
+//        postLikeRepository.save(postLike);
+//    }
+//
+//    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
+//        Post post = postRepository.findById(postId).get();
+//        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+//        if (post.getAuthorId() == personDTO.getId()){
+//            post.setMyLike(false);
+//            postRepository.save(post);
+//        }
+//        PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).get();
+//        postLikeRepository.delete(postLike);}
 
 }
 
