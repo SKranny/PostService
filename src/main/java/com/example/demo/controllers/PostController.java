@@ -64,6 +64,16 @@ public class PostController {
         return postService.findAllPosts(withFriends, toTime, fromTime, isDelete,  page, offset);
     }
 
+    @Operation(summary = "Получить посты по тэгам")
+    @GetMapping
+    public Page<PostDTO> findAllPostsbyTags(
+            @Valid @Min(0) @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
+            @Valid @Min(0) @RequestParam(name = "offset", defaultValue = "20", required = false) Integer offset,
+            @RequestParam(name = "tags", required = false) List<String> tags,
+    {
+        return postService.findAllPostsbyTags(tags,  page, offset);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Получение постов по ID")
     public PostDTO getPostById(@PathVariable Long id) {

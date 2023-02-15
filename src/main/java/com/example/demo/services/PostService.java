@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.example.demo.constants.PostType;
 import com.example.demo.dto.post.UpdatePostRequest;
 import com.example.demo.dto.tag.UpdateTagRequest;
@@ -207,5 +208,17 @@ public class PostService {
         else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
     }
 
+    public Page<PostDTO> findAllPostsbyTags(List<String> tags, Integer page, Integer offset) {
+        List<Post> posts = postRepository.findAll();
+        List<Tag> tagList = tagRepository.findByTagIgnoreCase(tags.get(0)).orElseThrow()
+                .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
+//        Set <Post> filteredPosts;
+//            for (int i = 0; i<posts.size(); i++) {
+//                Post post = posts.get(i);
+//                if post.getTags().contains()
+//
+//            }
+        return null;
+    }
 }
 
