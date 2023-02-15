@@ -207,5 +207,9 @@ public class PostService {
         else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
     }
 
+    public List<PostDTO> getAllPosts(){
+        return postRepository.findAll().stream().map(postMapper::toDTO).collect(Collectors.toList());
+    }
+
 }
 

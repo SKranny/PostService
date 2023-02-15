@@ -112,6 +112,12 @@ public class PostController {
         postService.deleteLikeFromPost(id, authentication);
     }
 
+    @Operation(summary = "Получение постов для статистики")
+    @GetMapping("/all")
+    @ResponseBody
+    public List<PostDTO> getAllPosts(){
+        return postService.getAllPosts();
+    }
 
 
 }
