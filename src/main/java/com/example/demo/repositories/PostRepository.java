@@ -3,9 +3,7 @@ package com.example.demo.repositories;
 import com.example.demo.model.Post;
 import com.example.demo.repositories.specifications.PostSpecification;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -41,6 +39,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     @Query(value = "SELECT * FROM post WHERE publish_time < NOW() ORDER BY publish_time DESC", nativeQuery = true)
     List<Post> findPublishedPosts();
-
 
 }

@@ -13,6 +13,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Comment> findByIdAndPostId(Long id, Long postId);
 
 
+
+
     @Query(value = "SELECT count(*) FROM comments", nativeQuery = true)
     Long getCommentsCount();
 

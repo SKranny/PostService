@@ -97,4 +97,21 @@ public class PostController {
     ){
         return postService.getAllFriendsNews(PageRequest.of(page, limit));
     }
+
+    @Operation(summary = "Поcтавить лайк на пост")
+    @PostMapping("/{id}/like")
+    @ResponseBody
+    public void likePost(@PathVariable Long id, TokenAuthentication authentication){
+        postService.likePost(id, authentication);
+    }
+
+    @Operation(summary = "Удалить лайк с поста")
+    @DeleteMapping("/{id}/like")
+    @ResponseBody
+    public void deleteLikeFromPost(@PathVariable Long id, TokenAuthentication authentication){
+        postService.deleteLikeFromPost(id, authentication);
+    }
+
+
+
 }

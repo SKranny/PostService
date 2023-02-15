@@ -9,7 +9,9 @@ import com.example.demo.feign.PersonService;
 import com.example.demo.dto.post.CreatePostRequest;
 import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
+import com.example.demo.model.PostLike;
 import com.example.demo.model.Tag;
+import com.example.demo.repositories.PostLikeRepository;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.TagRepository;
 import dto.postDto.PostDTO;
@@ -18,10 +20,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import security.TokenAuthentication;
 import security.dto.TokenData;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +41,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostMapper postMapper;
     private final FriendService friendService;
+    private final PostLikeRepository postLikeRepository;
 
     public Post findPostById(Long postId, Long personId) {
         return postRepository.findByIdAndAuthorId(postId, personId)
@@ -79,9 +84,10 @@ public class PostService {
     }
 
     public void createPost(CreatePostRequest req, TokenData tokenData){
-        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime time = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
         PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time)?
                 PostType.POSTED : PostType.SCHEDULED;
+        LocalDateTime publishTime = req.getPublishTime() == null ? time : req.getPublishTime();
         PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
         Post post = Post.builder()
                 .title(req.getTitle())
@@ -89,7 +95,7 @@ public class PostService {
                 .authorId(user.getId())
                 .time(time)
                 .type(postType)
-                .publishTime(req.getPublishTime())
+                .publishTime(publishTime)
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
         postRepository.save(post);
@@ -111,6 +117,7 @@ public class PostService {
                 .collect(Collectors.toList());
         return new PageImpl<>(posts);
     }
+
     private Post setTypePosted(Post post){
         post.setType(PostType.POSTED);
         postRepository.save(post);
@@ -168,6 +175,36 @@ public class PostService {
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
 
+    }
+
+    public void likePost(Long postId, TokenAuthentication authentication){
+        Post post = postRepository.findById(postId).get();
+        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+        if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isEmpty()){
+            post.setMyLike(post.getAuthorId() == personDTO.getId());
+            postRepository.save(post);
+
+            PostLike postLike = new PostLike();
+            postLike.setUserId(personDTO.getId());
+            postLike.getPosts().add(post);
+            postLikeRepository.save(postLike);
+        }
+        else throw new PostException("Already liked", HttpStatus.BAD_REQUEST);
+
+    }
+
+    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
+        Post post = postRepository.findById(postId).get();
+        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+        if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isPresent()) {
+            if (post.getAuthorId() == personDTO.getId()){
+                post.setMyLike(false);
+                postRepository.save(post);
+            }
+            PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).get();
+            postLikeRepository.delete(postLike);
+        }
+        else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
     }
 
 }

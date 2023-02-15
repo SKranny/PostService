@@ -7,13 +7,17 @@ import com.example.demo.exception.PostException;
 import com.example.demo.feign.PersonService;
 import com.example.demo.mappers.CommentMapper;
 import com.example.demo.model.Comment;
+import com.example.demo.model.CommentLike;
 import com.example.demo.model.Post;
+import com.example.demo.repositories.CommentLikeRepository;
 import com.example.demo.repositories.CommentRepository;
 import com.example.demo.repositories.PostRepository;
 import dto.userDto.PersonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import security.TokenAuthentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +31,7 @@ public class CommentService {
     private final PersonService personService;
     private final CommentMapper commentMapper;
     private final PostRepository postRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     public CommentDTO addComment(Long postId, CommentRequest commentRequest, String userEmail){
         PersonDTO user = personService.getPersonDTOByEmail(userEmail);
@@ -35,7 +40,6 @@ public class CommentService {
                 .authorId(user.getId())
                 .isBlocked(false)
                 .isDelete(false)
-                .likeAmount(0L)
                 .myLike(false)
                 .text(commentRequest.getText())
                 .post(postRepository.findById(postId).get())
@@ -77,6 +81,32 @@ public class CommentService {
                 .stream()
                 .map(commentMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public void likeComment(Long postId, Long commentId, TokenAuthentication authentication){
+        Comment comment = commentRepository.findById(commentId).get();
+        Post post = postRepository.findById(postId).get();
+        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+        if (comment.getAuthorId() == personDTO.getId()){
+            comment.setMyLike(true);
+            commentRepository.save(comment);
+        }
+        CommentLike commentLike = new CommentLike();
+        commentLike.setUserId(personDTO.getId());
+        commentLikeRepository.save(commentLike);
+    }
+
+    public void deleteLikeFromComment(Long postId, Long commentId, TokenAuthentication authentication){
+        Comment comment = commentRepository.findById(commentId).get();
+        Post post = postRepository.findById(postId).get();
+        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+        if (comment.getAuthorId() == personDTO.getId()){
+            comment.setMyLike(false);
+            commentRepository.save(comment);
+        }
+        CommentLike commentLike = commentLikeRepository.findByCommentIdAndPostId().get();
+        commentLikeRepository.delete(commentLike);
+
     }
 
 }

@@ -55,6 +55,20 @@ public class CommentController {
         return commentService.addComment(id, commentRequest, authentication.getTokenData().getEmail());
     }
 
+    @Operation(summary = "Поcтавить лайк на комментарий")
+    @PostMapping("/{id}/comment/{commentId}/like")
+    @ResponseBody
+    public void likePost(@PathVariable Long postId, @PathVariable Long commentId, TokenAuthentication authentication){
+        commentService.likeComment(postId, commentId, authentication);
+    }
+
+    @Operation(summary = "Удалить лайк с комментария")
+    @DeleteMapping("/{id}/comment/{commentId}/like")
+    @ResponseBody
+    public void deleteLikeFromPost(@PathVariable Long postId, @PathVariable Long commentId, TokenAuthentication authentication){
+        commentService.deleteLikeFromComment(postId, commentId, authentication);
+    }
+
 }
 
 

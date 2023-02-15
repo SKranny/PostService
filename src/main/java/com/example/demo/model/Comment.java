@@ -3,6 +3,8 @@ package com.example.demo.model;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -25,11 +27,12 @@ public class Comment {
     private LocalDateTime editTime;
     private Long authorId;
     private String text;
-    private boolean isBlocked;
-    private boolean isDelete;
-    private Long likeAmount;
-    private boolean myLike;
+    private Boolean isBlocked;
+    private Boolean isDelete;
+    private Boolean myLike;
     private String imagepath;
+    @ManyToMany(mappedBy = "comments")
+    private Set<CommentLike> commentLikes = new HashSet<>();
 }
 
 
