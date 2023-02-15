@@ -29,7 +29,6 @@ public class Comment {
     private String text;
     private Boolean isBlocked;
     private Boolean isDelete;
-    private Long likeAmount;
     private Boolean myLike;
     private String imagepath;
     @ManyToMany(mappedBy = "comments")

@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS comments(
     text                        TEXT NOT NULL,
     is_blocked                  BOOLEAN NOT NULL DEFAULT FALSE,
     is_delete                   BOOLEAN NOT NULL DEFAULT FALSE,
-    like_amount                 BIGINT NOT NULL DEFAULT 0,
     my_like                     BOOLEAN NOT NULL DEFAULT FALSE,
     imagepath                   TEXT,
     FOREIGN KEY (post_id) REFERENCES post(id)

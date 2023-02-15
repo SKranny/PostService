@@ -21,12 +21,13 @@ public class PostLike {
     Long id;
     Long userId;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+
+    @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinTable(
-            name = "like2post",
-            joinColumns = { @JoinColumn(name = "id") },
+            name = "post2like",
+            joinColumns = { @JoinColumn(name = "post_like_id") },
             inverseJoinColumns = { @JoinColumn(name = "post_id") }
     )
-    Set<Post> posts = new HashSet<>();
+    private Set<Post> posts = new HashSet<>();
 
 }

@@ -58,6 +58,7 @@ public class Post {
     @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
     private Set<Comment> comments;
 
+
     @ManyToMany(mappedBy = "posts")
     private Set<PostLike> postLikes = new HashSet<>();
 

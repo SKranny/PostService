@@ -1,5 +1,4 @@
 ALTER TABLE post ADD COLUMN my_like BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE comments DROP COLUMN like_amount;
 
 CREATE TABLE IF NOT EXISTS comment_likes (
     id                          BIGSERIAL PRIMARY KEY,

@@ -40,7 +40,6 @@ public class CommentService {
                 .authorId(user.getId())
                 .isBlocked(false)
                 .isDelete(false)
-                .likeAmount(0L)
                 .myLike(false)
                 .text(commentRequest.getText())
                 .post(postRepository.findById(postId).get())
