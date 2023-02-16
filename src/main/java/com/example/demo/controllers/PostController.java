@@ -60,8 +60,9 @@ public class PostController {
             @RequestParam(name = "withFriends", defaultValue = "false", required = false) Boolean withFriends,
             @RequestParam(name = "toTime", required = false) LocalDateTime toTime,
             @RequestParam(name = "fromTime", required = false) LocalDateTime fromTime,
-            @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete) {
-        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete,  page, offset);
+            @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete,
+            @RequestParam(name = "tags", required = false) List<String> tags) {
+        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete,  tags, page, offset);
     }
 
     @GetMapping("/{id}")

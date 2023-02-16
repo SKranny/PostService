@@ -125,11 +125,11 @@ public class PostService {
     }
 
     public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
-                                      Boolean isDelete, Integer page, Integer offset) {
+                                      Boolean isDelete, List<String> tags,  Integer page, Integer offset) {
         Pageable pageable = PageRequest.of(page, offset, Sort.by("time").descending());
 
         List<PostDTO> posts = postRepository.findAllByFilter(withFriends,
-                        isDelete, LocalDateTime.now(), toTime, fromTime, pageable).get()
+                        isDelete, LocalDateTime.now(), toTime, fromTime).stream()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
                         setTypePosted(post);
@@ -138,7 +138,18 @@ public class PostService {
                     return postDTO;
                 })
                 .collect(Collectors.toList());
-        return new PageImpl<>(posts);
+        if (tags == null) {
+            return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
+        }
+        List<PostDTO> postsWithTags = tagRepository.findAll()
+                .stream()
+                .filter(t -> tags.contains(t.getTag()))
+                .flatMap(tag -> tag.getPosts().stream())
+                .distinct()
+                .map(postMapper::toDTO)
+                .filter(posts::contains)
+                .collect(Collectors.toList());
+        return new PageImpl<>(postsWithTags, pageable, postsWithTags.size());
     }
 
 
@@ -155,7 +166,7 @@ public class PostService {
                 .collect(Collectors.toSet());
     }
 
-    public void updateTags(List<UpdateTagRequest> reqs, Post post){
+    public void updateTags(List<UpdateTagRequest> reqs, Post post) {
         post.setTags(getOrBuildTags(reqs.stream()
                 .map(UpdateTagRequest::getText)
                 .collect(Collectors.toSet())));
@@ -206,6 +217,5 @@ public class PostService {
         }
         else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
     }
-
 }
 
