@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.example.demo.constants.PostType;
 import com.example.demo.dto.post.UpdatePostRequest;
 import com.example.demo.dto.tag.UpdateTagRequest;
@@ -126,11 +125,11 @@ public class PostService {
     }
 
     public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
-                                      Boolean isDelete, Integer page, Integer offset) {
+                                      Boolean isDelete, List<String> tags,  Integer page, Integer offset) {
         Pageable pageable = PageRequest.of(page, offset, Sort.by("time").descending());
 
         List<PostDTO> posts = postRepository.findAllByFilter(withFriends,
-                        isDelete, LocalDateTime.now(), toTime, fromTime, pageable).get()
+                        isDelete, LocalDateTime.now(), toTime, fromTime).stream()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
                         setTypePosted(post);
@@ -139,7 +138,18 @@ public class PostService {
                     return postDTO;
                 })
                 .collect(Collectors.toList());
-        return new PageImpl<>(posts);
+        if (tags == null) {
+            return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
+        }
+        List<PostDTO> postsWithTags = tagRepository.findAll()
+                .stream()
+                .filter(t -> tags.contains(t.getTag()))
+                .flatMap(tag -> tag.getPosts().stream())
+                .distinct()
+                .map(postMapper::toDTO)
+                .filter(posts::contains)
+                .collect(Collectors.toList());
+        return new PageImpl<>(postsWithTags, pageable, postsWithTags.size());
     }
 
 
@@ -156,7 +166,7 @@ public class PostService {
                 .collect(Collectors.toSet());
     }
 
-    public void updateTags(List<UpdateTagRequest> reqs, Post post){
+    public void updateTags(List<UpdateTagRequest> reqs, Post post) {
         post.setTags(getOrBuildTags(reqs.stream()
                 .map(UpdateTagRequest::getText)
                 .collect(Collectors.toSet())));
@@ -206,19 +216,6 @@ public class PostService {
             postLikeRepository.delete(postLike);
         }
         else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
-    }
-
-    public Page<PostDTO> findAllPostsbyTags(List<String> tags, Integer page, Integer offset) {
-        List<Post> posts = postRepository.findAll();
-        List<Tag> tagList = tagRepository.findByTagIgnoreCase(tags.get(0)).orElseThrow()
-                .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
-//        Set <Post> filteredPosts;
-//            for (int i = 0; i<posts.size(); i++) {
-//                Post post = posts.get(i);
-//                if post.getTags().contains()
-//
-//            }
-        return null;
     }
 }
 

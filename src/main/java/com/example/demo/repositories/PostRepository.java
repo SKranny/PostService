@@ -23,14 +23,14 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     Page<Post> findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(Collection<Long> authorId, Pageable pageable);
     Optional<Post> findByIdAndAuthorId(Long id, Long authorId);
 
-    default Page<Post> findAllByFilter(Boolean withFriends, Boolean isDelete, LocalDateTime now,
-                                       LocalDateTime toTime, LocalDateTime fromTime, Pageable pageable) {
+    default List<Post> findAllByFilter(Boolean withFriends, Boolean isDelete, LocalDateTime now,
+                                       LocalDateTime toTime, LocalDateTime fromTime) {
         Specification<Post> specification = Specification.where(PostSpecification.isWithFriends(withFriends))
                 .and(PostSpecification.postedPost(now))
                 .and(PostSpecification.isDeletePost(isDelete))
                 .and(PostSpecification.toTime(Optional.ofNullable(toTime).orElse(LocalDateTime.now())))
                 .and(PostSpecification.fromTime(Optional.ofNullable(fromTime).orElse(LocalDateTime.now().minusYears(1))));
-        return this.findAll(specification, pageable);
+        return this.findAll(specification);
     }
     List<Post> findAllByOrderByTimeDesc();
 
