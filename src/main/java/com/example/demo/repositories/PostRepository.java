@@ -1,6 +1,7 @@
 package com.example.demo.repositories;
 
 import com.example.demo.model.Post;
+import com.example.demo.model.Tag;
 import com.example.demo.repositories.specifications.PostSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor {
