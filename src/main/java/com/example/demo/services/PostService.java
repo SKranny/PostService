@@ -139,10 +139,8 @@ public class PostService {
         if (tags == null) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
         }
-        List <PostDTO> postsDTOwithTags = tags.stream()
-                .filter(t-> tagRepository.findByTagIgnoreCase(t).isPresent())
-                .map(t -> tagRepository.findByTagIgnoreCase(t).get())
-                .flatMap(t-> t.getPosts().stream())
+        List <PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()
+                .flatMap(p -> p.getPosts().stream())
                 .distinct()
                 .map(postMapper::toDTO)
                 .filter(posts::contains)
