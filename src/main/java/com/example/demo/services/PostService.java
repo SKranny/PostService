@@ -26,10 +26,7 @@ import security.dto.TokenData;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -141,15 +138,15 @@ public class PostService {
         if (tags == null) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
         }
-        List<PostDTO> postsWithTags = tagRepository.findAll()
-                .stream()
-                .filter(t -> tags.contains(t.getTag()))
-                .flatMap(tag -> tag.getPosts().stream())
+        List <PostDTO> postsDTOwithTags = tags.stream()
+                .filter(t-> tagRepository.findByTagIgnoreCase(t).isPresent())
+                .map(t -> tagRepository.findByTagIgnoreCase(t).get())
+                .flatMap(t-> t.getPosts().stream())
                 .distinct()
                 .map(postMapper::toDTO)
                 .filter(posts::contains)
                 .collect(Collectors.toList());
-        return new PageImpl<>(postsWithTags, pageable, postsWithTags.size());
+        return new PageImpl<>(postsDTOwithTags, pageable,postsDTOwithTags.size());
     }
 
 
