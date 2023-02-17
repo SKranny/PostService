@@ -135,6 +135,7 @@ public class PostService {
                     return postDTO;
                 })
                 .collect(Collectors.toList());
+
         if (tags == null) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
         }
@@ -202,6 +203,7 @@ public class PostService {
     }
 
     public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
+
         Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
         if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isPresent()) {
