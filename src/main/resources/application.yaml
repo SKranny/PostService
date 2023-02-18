@@ -16,6 +16,7 @@ spring:
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    show-sql: true
     hibernate:
       ddl-auto: none
 
