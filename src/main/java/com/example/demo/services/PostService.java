@@ -122,8 +122,30 @@ public class PostService {
     }
 
     public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
-                                      Boolean isDelete, List<String> tags,  Integer page, Integer offset) {
+                                      Boolean isDelete, List<String> tags, String range,
+                                      Integer page, Integer offset) {
         Pageable pageable = PageRequest.of(page, offset, Sort.by("time").descending());
+
+        if (range != null) {
+            switch (range) {
+                case ("year"):
+                    toTime = LocalDateTime.now();
+                    fromTime = LocalDateTime.now().minusYears(1);
+                    break;
+                case ("month"):
+                    toTime = LocalDateTime.now();
+                    fromTime = LocalDateTime.now().minusMonths(1);
+                    break;
+                case ("week"):
+                    toTime = LocalDateTime.now();
+                    fromTime = LocalDateTime.now().minusWeeks(1);
+                    break;
+                case ("alltime"):
+                    toTime = LocalDateTime.now();
+                    fromTime = LocalDateTime.of(1, 1, 1, 1, 1, 1, 1);
+                    break;
+            }
+        }
 
         List<PostDTO> posts = postRepository.findAllByFilter(withFriends,
                         isDelete, LocalDateTime.now(), toTime, fromTime).stream()
@@ -136,7 +158,7 @@ public class PostService {
                 })
                 .collect(Collectors.toList());
 
-        if (tags == null) {
+        if (tags == null || tags.isEmpty()) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
         }
         List <PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()

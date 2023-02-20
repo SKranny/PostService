@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import security.TokenAuthentication;
 
@@ -58,11 +59,15 @@ public class PostController {
             @Valid @Min(0) @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
             @Valid @Min(0) @RequestParam(name = "offset", defaultValue = "20", required = false) Integer offset,
             @RequestParam(name = "withFriends", defaultValue = "false", required = false) Boolean withFriends,
-            @RequestParam(name = "toTime", required = false) LocalDateTime toTime,
-            @RequestParam(name = "fromTime", required = false) LocalDateTime fromTime,
+            @RequestParam(name = "toTime", required = false)
+                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toTime,
+            @RequestParam(name = "fromTime", required = false)
+                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromTime,
             @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete,
-            @RequestParam(name = "tags", required = false) List<String> tags) {
-        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete,  tags, page, offset);
+            @RequestParam(name = "tags", required = false) List<String> tags,
+            @RequestParam(name = "range", required = false) String range)
+    {
+        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete, tags, range, page, offset);
     }
 
     @GetMapping("/{id}")
