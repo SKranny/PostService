@@ -24,6 +24,7 @@ import security.TokenAuthentication;
 import security.dto.TokenData;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashSet;
@@ -209,6 +210,13 @@ public class PostService {
 
     public List<PostDTO> getAllPosts(){
         return postRepository.findAll().stream().map(postMapper::toDTO).collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getAllPostsByTimeBetween(LocalDate date1, LocalDate date2){
+        return postRepository.getAllPostsByTimeBetween(date1,date2)
+                .stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 }

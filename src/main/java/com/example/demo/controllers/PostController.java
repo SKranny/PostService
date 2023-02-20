@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.post.CreatePostRequest;
 import com.example.demo.dto.post.UpdatePostRequest;
+import com.example.demo.feign.BetweenDataRequest;
 import com.example.demo.services.PostService;
 import dto.postDto.PostDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import security.TokenAuthentication;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -112,12 +114,13 @@ public class PostController {
         postService.deleteLikeFromPost(id, authentication);
     }
 
-    @Operation(summary = "Получение постов для статистики")
-    @GetMapping("/all")
-    @ResponseBody
+    @GetMapping("/allPost")
     public List<PostDTO> getAllPosts(){
         return postService.getAllPosts();
     }
 
-
+    @GetMapping("/allPostBetween")
+    public List<PostDTO> getAllPostsByTimeBetween(BetweenDataRequest request){
+        return postService.getAllPostsByTimeBetween(request.getDate1(),request.getDate2());
+    }
 }

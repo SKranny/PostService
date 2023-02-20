@@ -2,6 +2,7 @@ package com.example.demo.repositories;
 
 import com.example.demo.model.Post;
 import com.example.demo.repositories.specifications.PostSpecification;
+import dto.postDto.PostDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,8 +12,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,5 +42,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     @Query(value = "SELECT * FROM post WHERE publish_time < NOW() ORDER BY publish_time DESC", nativeQuery = true)
     List<Post> findPublishedPosts();
+
+    List<Post> getAllPostsByTimeBetween(LocalDate date1, LocalDate date2);
 
 }
