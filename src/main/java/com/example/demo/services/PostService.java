@@ -14,8 +14,12 @@ import com.example.demo.model.Tag;
 import com.example.demo.repositories.PostLikeRepository;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.TagRepository;
+import constants.NotificationType;
+import dto.notification.ContentDTO;
 import dto.postDto.PostDTO;
+import dto.postDto.PostNotificationRequest;
 import dto.userDto.PersonDTO;
+import kafka.annotation.SubmitToKafka;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -204,6 +208,20 @@ public class PostService {
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
 
+    }
+
+    @SubmitToKafka(topic = "Post")
+    public PostNotificationRequest createNotification(Post post){
+        return PostNotificationRequest.builder()
+                .authorId(post.getAuthorId())
+                .title(post.getTitle())
+                .type(NotificationType.POST)
+                .content(ContentDTO.builder()
+                        .text(post.getPostText())
+                        .attaches(new ArrayList<>())
+                        .build())
+                .friendsId(friendService.getFriendId())
+                .build();
     }
 
     public void likePost(Long postId, TokenAuthentication authentication){
