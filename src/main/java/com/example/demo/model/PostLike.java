@@ -21,7 +21,6 @@ public class PostLike {
     Long id;
     Long userId;
 
-
     @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinTable(
             name = "post2like",

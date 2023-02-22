@@ -16,11 +16,11 @@ import dto.userDto.PersonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import security.TokenAuthentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,28 +85,40 @@ public class CommentService {
 
     public void likeComment(Long postId, Long commentId, TokenAuthentication authentication){
         Comment comment = commentRepository.findById(commentId).get();
-        Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
-        if (comment.getAuthorId() == personDTO.getId()){
-            comment.setMyLike(true);
-            commentRepository.save(comment);
-        }
-        CommentLike commentLike = new CommentLike();
-        commentLike.setUserId(personDTO.getId());
-        commentLikeRepository.save(commentLike);
+        if (commentLikeRepository.findByCommentIdPostIdUserId(commentId, postId, personDTO.getId()).isEmpty()){
+            if (comment.getAuthorId() == personDTO.getId()){
+                setMyLike(true, comment);
+            }
+            newCommentLike(personDTO, comment);
+        } else throw new CommentException("Already liked", HttpStatus.BAD_REQUEST);
+
     }
 
     public void deleteLikeFromComment(Long postId, Long commentId, TokenAuthentication authentication){
         Comment comment = commentRepository.findById(commentId).get();
-        Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
-        if (comment.getAuthorId() == personDTO.getId()){
-            comment.setMyLike(false);
-            commentRepository.save(comment);
-        }
-        CommentLike commentLike = commentLikeRepository.findByCommentIdAndPostId().get();
-        commentLikeRepository.delete(commentLike);
+        Optional<CommentLike> commentLike = commentLikeRepository
+                .findByCommentIdPostIdUserId(commentId, postId, personDTO.getId());
+        if (commentLike.isPresent()){
+            if (comment.getAuthorId() == personDTO.getId()){
+                setMyLike(false, comment);
+            }
+            commentLikeRepository.delete(commentLike.get());
+        } else throw new CommentException("Already unliked", HttpStatus.BAD_REQUEST);
 
+
+    }
+
+    private void newCommentLike(PersonDTO personDTO, Comment comment){
+        CommentLike commentLike = new CommentLike();
+        commentLike.setUserId(personDTO.getId());
+        commentLike.getComments().add(comment);
+        commentLikeRepository.save(commentLike);
+    }
+    private void setMyLike(Boolean isMyLike, Comment comment){
+        comment.setMyLike(isMyLike);
+        commentRepository.save(comment);
     }
 
 }
