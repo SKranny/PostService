@@ -109,7 +109,8 @@ public class PostService {
     }
 
     public Page<PostDTO> getAllPostsByUser(Long id, Pageable pageable) {
-        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id,LocalDateTime.now(), pageable).get()
+        LocalDateTime time = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id, time, pageable).get()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
                         setTypePosted(post);
