@@ -99,6 +99,7 @@ public class PostService {
                 .publishTime(publishTime)
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
+        createNotification(post);
         postRepository.save(post);
     }
 
