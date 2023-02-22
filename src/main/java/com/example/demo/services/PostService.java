@@ -99,8 +99,8 @@ public class PostService {
                 .publishTime(publishTime)
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
-        createNotification(post);
         postRepository.save(post);
+        createNotification(post);
     }
 
     public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable){
