@@ -65,9 +65,10 @@ public class PostController {
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromTime,
             @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete,
             @RequestParam(name = "tags", required = false) List<String> tags,
-            @RequestParam(name = "range", required = false) String range)
+            @RequestParam(name = "range", required = false) String range,
+            @RequestParam(name = "author", required = false) String author)
     {
-        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete, tags, range, page, offset);
+        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete, tags, range, author, page, offset);
     }
 
     @GetMapping("/{id}")
