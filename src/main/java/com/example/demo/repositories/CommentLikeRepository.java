@@ -14,7 +14,7 @@ public interface CommentLikeRepository extends JpaRepository  <CommentLike, Long
             "JOIN comment_likes cl ON c2cl.comment_like_id = cl.id", nativeQuery = true)
     Optional<CommentLike> findByCommentIdAndPostId();
 
-    @Query(value = "SELECT cl.id FROM comment2like c2l INNER JOIN comment_likes cl ON c2l.comment_like_id = cl.id " +
+    @Query(value = "SELECT cl.id, cl.user_id FROM comment2like c2l INNER JOIN comment_likes cl ON c2l.comment_like_id = cl.id " +
             "INNER JOIN comments c ON c2l.comment_id = c.id INNER JOIN post p ON c.post_id = p.id " +
             "WHERE cl.user_id = :userId AND c.id = :commentId AND p.id = :postId", nativeQuery = true)
     Optional<CommentLike> findByCommentIdPostIdUserId(@Param("commentId") Long commentId,

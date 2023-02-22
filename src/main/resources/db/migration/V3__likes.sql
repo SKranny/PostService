@@ -11,9 +11,10 @@ CREATE TABLE IF NOT EXISTS post_likes (
 );
 
 CREATE TABLE comment2like (
-  comment_like_id                      BIGINT REFERENCES comment_likes(id),
-  comment_id                           BIGINT REFERENCES comments(id),
-  PRIMARY KEY (comment_like_id, comment_id)
+  comment_like_id  BIGINT REFERENCES comment_likes(id),
+  comment_id       BIGINT,
+  PRIMARY KEY (comment_like_id, comment_id),
+  FOREIGN KEY (comment_id) REFERENCES comments(id)
 );
 
 CREATE TABLE post2like (

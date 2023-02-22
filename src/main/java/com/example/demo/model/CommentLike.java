@@ -21,7 +21,7 @@ public class CommentLike {
     Long id;
     Long userId;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinTable(
             name = "comment2like",
             joinColumns = { @JoinColumn(name = "comment_like_id") },
