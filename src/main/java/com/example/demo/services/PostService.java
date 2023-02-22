@@ -92,6 +92,7 @@ public class PostService {
                 .authorId(user.getId())
                 .time(time)
                 .type(postType)
+                .myLike(false)
                 .publishTime(publishTime)
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
