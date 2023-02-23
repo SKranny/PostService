@@ -13,5 +13,5 @@ public interface PersonService {
     PersonDTO getPersonDTOByEmail(@PathVariable(name = "email") String email);
 
     @GetMapping("/searchByName")
-    Set<PersonDTO> searchAccountsByName(@RequestParam(value = "userName", required = false) String userName);
+    Set<PersonDTO> searchAllBySubstringInFirstOrLastName(@RequestParam(value = "subName", required = false) String subName);
 }

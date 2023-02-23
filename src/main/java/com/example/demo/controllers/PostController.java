@@ -66,9 +66,10 @@ public class PostController {
             @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete,
             @RequestParam(name = "tags", required = false) List<String> tags,
             @RequestParam(name = "range", required = false) String range,
-            @RequestParam(name = "author", required = false) String author)
+            @RequestParam(name = "author", required = false) String authorSubStrings)
     {
-        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete, tags, range, author, page, offset);
+        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete, tags, range, authorSubStrings,
+                                        page, offset);
     }
 
     @GetMapping("/{id}")
