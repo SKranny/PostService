@@ -128,8 +128,17 @@ public class PostService {
         return post;
     }
 
+    public Set<Long> findAllUsersBySubstringsInFirstOrLastNames(String authorSubstringsInNames) {
+        String[] words = authorSubstringsInNames.split("\\s");
+        Set<PersonDTO> personDTOSet = personService.searchAllBySubstringInFirstOrLastName(words[0]);
+        for (int i = 1; i < words.length; i++) {
+            personDTOSet.retainAll(personService.searchAllBySubstringInFirstOrLastName(words[i]));
+        }
+        return personDTOSet.stream().map(PersonDTO::getId).collect(Collectors.toSet());
+    }
+
     public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
-                                      Boolean isDelete, List<String> tags, String range,
+                                      Boolean isDelete, List<String> tags, String range, String authorSubStringsInNames,
                                       Integer page, Integer offset) {
         Pageable pageable = PageRequest.of(page, offset, Sort.by("time").descending());
 
@@ -164,6 +173,11 @@ public class PostService {
                     return postDTO;
                 })
                 .collect(Collectors.toList());
+
+        if (authorSubStringsInNames != null && !authorSubStringsInNames.isBlank()) {
+            Set<Long> usersList = findAllUsersBySubstringsInFirstOrLastNames(authorSubStringsInNames);
+            posts = posts.stream().filter(p -> usersList.contains(p.getId())).collect(Collectors.toList());
+        }
 
         if (tags == null || tags.isEmpty()) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
