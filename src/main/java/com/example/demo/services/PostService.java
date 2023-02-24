@@ -11,6 +11,7 @@ import com.example.demo.mappers.PostMapper;
 import com.example.demo.model.Post;
 import com.example.demo.model.PostLike;
 import com.example.demo.model.Tag;
+import com.example.demo.repositories.CommentRepository;
 import com.example.demo.repositories.PostLikeRepository;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.TagRepository;
@@ -43,6 +44,7 @@ public class PostService {
     private final PostMapper postMapper;
     private final FriendService friendService;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
 
     public Post findPostById(Long postId, Long personId) {
         return postRepository.findByIdAndAuthorId(postId, personId)
@@ -55,7 +57,10 @@ public class PostService {
     }
 
     public PostDTO findById(Long id) {
-        return postMapper.toDTO(findPostById(id));
+        PostDTO postDTO = postMapper.toDTO(findPostById(id));
+        postDTO.setCommentAmount(commentRepository.getCommentsCount(id));
+        postDTO.setLikeAmount(postLikeRepository.getLikesCount(id));
+        return postDTO;
     }
 
     public PostDTO editPost(UpdatePostRequest req, TokenData tokenData){
@@ -71,7 +76,6 @@ public class PostService {
         } else {
             post.setTags(new HashSet<>());
         }
-
         return postMapper.toDTO(postRepository.save(post));
     }
 
@@ -116,6 +120,8 @@ public class PostService {
                         setTypePosted(post);
                     }
                     PostDTO postDTO = postMapper.toDTO(post);
+                    postDTO.setLikeAmount(postLikeRepository.getLikesCount(postDTO.getId()));
+                    postDTO.setCommentAmount(commentRepository.getCommentsCount(postDTO.getId()));
                     return postDTO;
                 })
                 .collect(Collectors.toList());
@@ -170,6 +176,8 @@ public class PostService {
                         setTypePosted(post);
                     }
                     PostDTO postDTO = postMapper.toDTO(post);
+                    postDTO.setCommentAmount(commentRepository.getCommentsCount(postDTO.getId()));
+                    postDTO.setLikeAmount(postLikeRepository.getLikesCount(postDTO.getId()));
                     return postDTO;
                 })
                 .collect(Collectors.toList());
