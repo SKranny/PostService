@@ -193,7 +193,7 @@ public class PostService {
 
         if (authorSubStringsInNames != null && !authorSubStringsInNames.isBlank()) {
             Set<Long> usersList = findAllUsersBySubstringsInFirstOrLastNames(authorSubStringsInNames);
-            posts = posts.stream().filter(p -> usersList.contains(p.getId())).collect(Collectors.toList());
+            posts = posts.stream().filter(p -> usersList.contains(p.getAuthorId())).collect(Collectors.toList());
         }
 
         if (tags == null || tags.isEmpty()) {
