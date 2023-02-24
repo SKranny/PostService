@@ -85,16 +85,16 @@ public class PostService {
     }
 
     public void createPost(CreatePostRequest req, TokenData tokenData){
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-        PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time)?
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+        PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(now)?
                 PostType.POSTED : PostType.SCHEDULED;
-        LocalDateTime publishTime = req.getPublishTime() == null ? time : req.getPublishTime();
+        LocalDateTime publishTime = setPublishTime(now, req);
         PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
         Post post = Post.builder()
                 .title(req.getTitle())
                 .postText(req.getText())
                 .authorId(user.getId())
-                .time(time)
+                .time(now)
                 .type(postType)
                 .myLike(false)
                 .publishTime(publishTime)
@@ -102,6 +102,15 @@ public class PostService {
                 .build();
         postRepository.save(post);
         createNotification(post);
+    }
+
+    private LocalDateTime setPublishTime(LocalDateTime currentTime, CreatePostRequest req){
+        if (req.getPublishTime() == null){
+            return currentTime;
+        } else if (req.getPublishTime().isAfter(currentTime)) {
+            return req.getPublishTime();
+        }
+        else throw new PostException("Publish time can't be before current time", HttpStatus.BAD_REQUEST);
     }
 
     public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable){
@@ -140,7 +149,7 @@ public class PostService {
     public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
                                       Boolean isDelete, List<String> tags, String range, String authorSubStringsInNames,
                                       Integer page, Integer offset) {
-        Pageable pageable = PageRequest.of(page, offset, Sort.by("time").descending());
+        Pageable pageable = PageRequest.of(page, offset, Sort.by("publishTime").descending());
 
         if (range != null) {
             switch (range) {
