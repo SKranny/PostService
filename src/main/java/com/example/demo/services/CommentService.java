@@ -36,19 +36,19 @@ public class CommentService {
     public CommentDTO addComment(Long postId, CommentRequest commentRequest, String userEmail){
         PersonDTO user = personService.getPersonDTOByEmail(userEmail);
         LocalDateTime time = LocalDateTime.now();
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException("Post with the id doesn't exist"));
         Comment comment = Comment.builder()
                 .authorId(user.getId())
                 .isBlocked(false)
                 .isDelete(false)
                 .myLike(false)
                 .text(commentRequest.getText())
-                .post(postRepository.findById(postId).get())
+                .post(post)
                 .time(time)
                 .imagepath("")
                 .build();
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException("Post with the id doesn't exist"));
-        postRepository.save(post);
+
         commentRepository.save(comment);
         return commentMapper.toDTO(comment);
     }
