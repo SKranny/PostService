@@ -89,6 +89,15 @@ public class CommentService {
                     return commentDTO;
                 })
                 .collect(Collectors.toList());
+
+    }
+
+    public List<CommentDTO> getAllCommentsByText(Long postId, String text) {
+        return commentRepository
+                .findAllByPostIdAndTextContainingIgnoreCase(postId, text)
+                .stream()
+                .map(commentMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public void likeComment(Long postId, Long commentId, TokenAuthentication authentication){
