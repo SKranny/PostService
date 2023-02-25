@@ -199,15 +199,23 @@ public class PostService {
         if (tags == null || tags.isEmpty()) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
         }
-        List <PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()
+
+        List<PostDTO> finalPosts = posts;
+        List<PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()
                 .flatMap(p -> p.getPosts().stream())
                 .distinct()
                 .map(postMapper::toDTO)
-                .filter(posts::contains)
+                .filter(p ->
+                        {
+                            for (PostDTO post : finalPosts) {
+                                if (Objects.equals(post.getId(), p.getId())) return true;
+                            }
+                            return false;
+                        }
+                )
                 .collect(Collectors.toList());
         return new PageImpl<>(postsDTOwithTags, pageable,postsDTOwithTags.size());
     }
-
 
     private Tag getOrBuildTag(String text) {
         return tagRepository.findByTagIgnoreCase(text)
@@ -287,6 +295,13 @@ public class PostService {
             postLikeRepository.delete(postLike);
         }
         else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
+    }
+
+    public List<PostDTO> getAllDelayedPosts(Long id, Integer page, Integer offset) {
+        Pageable pageable = PageRequest.of(page, offset, Sort.by("publishTime").descending());
+        return postRepository.findAllByAuthorIdAndType( id, PostType.SCHEDULED, pageable).stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
 
