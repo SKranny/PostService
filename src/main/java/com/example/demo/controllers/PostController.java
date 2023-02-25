@@ -120,6 +120,15 @@ public class PostController {
         postService.deleteLikeFromPost(id, authentication);
     }
 
+    @Operation(summary = "Получение списка всех отложенных постов пользователя")
+    @GetMapping("/user/{id}/delayed")
+    public List<PostDTO> getAllDelayedPosts(@PathVariable Long id,
+                                              @Valid @Min(0) @RequestParam(name = "page", defaultValue = "0",
+                                                      required = false) Integer page,
+                                              @Valid @Min(0) @RequestParam(name = "offset",
+                                                      defaultValue = "20", required = false) Integer offset) {
+        return postService.getAllDelayedPosts(id, page, offset);
+    }
 
 
 }

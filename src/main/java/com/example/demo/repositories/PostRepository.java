@@ -1,7 +1,7 @@
 package com.example.demo.repositories;
 
+import com.example.demo.constants.PostType;
 import com.example.demo.model.Post;
-import com.example.demo.model.Tag;
 import com.example.demo.repositories.specifications.PostSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor {
     //Page<Post> findAllByAuthorIdAndIsDeleteIsFalseOrderByTimeDesc(Long author_id, Pageable pageable);
     Page<Post> findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(Long author_id, LocalDateTime now, Pageable pageable);
     Page<Post> findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(Collection<Long> authorId, Pageable pageable);
+    Page<Post> findAllByAuthorIdAndType(Long id, PostType postType, Pageable pageable);
     Optional<Post> findByIdAndAuthorId(Long id, Long authorId);
 
     default List<Post> findAllByFilter(Boolean withFriends, Boolean isDelete, LocalDateTime now,
