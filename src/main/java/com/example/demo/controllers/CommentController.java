@@ -42,8 +42,8 @@ public class CommentController {
     @Operation(summary = "Получить все комментарии")
     @GetMapping("{id}/comment")
     @ResponseBody
-    public List<CommentDTO> getAllComments(@PathVariable Long id){
-        return commentService.getAllComments(id);
+    public List<CommentDTO> getAllComments(@PathVariable Long id, TokenAuthentication authentication){
+        return commentService.getAllComments(id, authentication.getTokenData().getEmail());
     }
 
     @Operation(summary = "Создать комментарий")

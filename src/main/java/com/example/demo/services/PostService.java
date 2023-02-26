@@ -56,10 +56,12 @@ public class PostService {
                 .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
     }
 
-    public PostDTO findById(Long id) {
+    public PostDTO findById(Long id, String email) {
         PostDTO postDTO = postMapper.toDTO(findPostById(id));
+        PersonDTO personDTO = personService.getPersonDTOByEmail(email);
         postDTO.setCommentAmount(commentRepository.getCommentsCount(id));
         postDTO.setLikeAmount(postLikeRepository.getLikesCount(id));
+        postDTO.setMyLike(postLikeRepository.findByPostIdAndUserId(id, personDTO.getId()).isPresent());
         return postDTO;
     }
 
@@ -122,6 +124,7 @@ public class PostService {
                     PostDTO postDTO = postMapper.toDTO(post);
                     postDTO.setLikeAmount(postLikeRepository.getLikesCount(postDTO.getId()));
                     postDTO.setCommentAmount(commentRepository.getCommentsCount(postDTO.getId()));
+                    postDTO.setMyLike(postLikeRepository.findByPostIdAndUserId(postDTO.getId(), id).isPresent());
                     return postDTO;
                 })
                 .collect(Collectors.toList());

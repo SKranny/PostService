@@ -12,6 +12,7 @@ import com.example.demo.model.Post;
 import com.example.demo.repositories.CommentLikeRepository;
 import com.example.demo.repositories.CommentRepository;
 import com.example.demo.repositories.PostRepository;
+import dto.postDto.PostDTO;
 import dto.userDto.PersonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -75,11 +76,18 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public List<CommentDTO> getAllComments(Long postId){
+    public List<CommentDTO> getAllComments(Long postId, String email){
+        PersonDTO personDTO = personService.getPersonDTOByEmail(email);
+
         return commentRepository
                 .findAllByPostId(postId)
                 .stream()
-                .map(commentMapper::toDTO)
+                .map(c -> {
+                    CommentDTO commentDTO = commentMapper.toDTO(c);
+                    commentDTO.setMyLike(commentLikeRepository
+                            .findByCommentIdPostIdUserId(c.getId(), postId, personDTO.getId()).isPresent());
+                    return commentDTO;
+                })
                 .collect(Collectors.toList());
     }
 
