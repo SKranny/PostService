@@ -55,7 +55,7 @@ build_and_push_image:
         - docker push $DOCKER_LOGIN/post-service:latest
 
 deploy:
-    image: ubuntu:latest
+    image: ubuntu:rolling
     stage: deploy
     only:
         - develop
