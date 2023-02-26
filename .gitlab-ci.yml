@@ -54,7 +54,6 @@ build_and_push_image:
         - docker build --no-cache -t $DOCKER_LOGIN/post-service:latest .
         - docker push $DOCKER_LOGIN/post-service:latest
 
-
 deploy:
     image: ubuntu:latest
     stage: deploy
