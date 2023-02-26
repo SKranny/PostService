@@ -13,6 +13,7 @@ import com.example.demo.repositories.CommentRepository;
 import com.example.demo.repositories.PostLikeRepository;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.TagRepository;
+import com.example.demo.repositories.specifications.PostSpecification;
 import constants.NotificationType;
 import dto.notification.ContentDTO;
 import dto.postDto.PostDTO;
@@ -21,12 +22,14 @@ import dto.userDto.PersonDTO;
 import kafka.annotation.SubmitToKafka;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import security.TokenAuthentication;
 import security.dto.TokenData;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -310,6 +313,59 @@ public class PostService {
         return postRepository.findAllByAuthorIdAndType( id, PostType.SCHEDULED, pageable).stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getAllPosts(){
+        return postRepository.findAll().stream().map(postMapper::toDTO).collect(Collectors.toList());
+    }
+
+    public Page<PostDTO> getAllPosts(String searchedTitle, Integer page){
+        Specification<Post> spec = Specification.where(null);
+        if (searchedTitle != null){
+            spec = spec.and(PostSpecification.likeSearchedTitle(searchedTitle));
+        }
+        Page<Post> posts = postRepository.findAll(spec, PageRequest.of(page - 1, 20));
+        return new PageImpl<>(posts.stream().map(postMapper::toDTO).collect(Collectors.toList()));
+    }
+
+    public List<PostDTO> getAllPostsByTimeBetween(LocalDate date1, LocalDate date2){
+        return postRepository.findAllPostsByTimeBetween(date1,date2)
+                .stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Page<PostDTO> getAllPostsByIsBlockedIsTrue(String searchedTitle,Integer page){
+        if (searchedTitle!=null){
+            Specification<Post> spec = Specification
+                    .where(PostSpecification.likeSearchedTitle(searchedTitle))
+                    .and(PostSpecification.isBlockedPost(true));
+            Page<Post> posts = postRepository.findAll(spec,PageRequest.of(page,20));
+            return new PageImpl<>(posts.stream()
+                    .map(postMapper::toDTO)
+                    .collect(Collectors.toList()));
+        }
+        return new PageImpl<>(postRepository.findAllPostsByIsBlockedIsTrue()
+                .stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList()));
+    }
+
+    public Page<PostDTO> getAllActivePosts(String searchedTitle,Integer page){
+        if (searchedTitle!=null){
+            Specification<Post> spec = Specification
+                    .where(PostSpecification.likeSearchedTitle(searchedTitle))
+                    .and(PostSpecification.isBlockedPost(false))
+                    .and(PostSpecification.isDeletePost(false));
+            Page<Post> posts = postRepository.findAll(spec,PageRequest.of(page,20));
+            return new PageImpl<>(posts.stream()
+                    .map(postMapper::toDTO)
+                    .collect(Collectors.toList()));
+        }
+        return new PageImpl<>(postRepository.findAllPostsByIsBlockedAndIsDeletedIsFalse()
+                .stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList()));
     }
 }
 

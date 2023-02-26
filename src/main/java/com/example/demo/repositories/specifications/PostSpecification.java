@@ -31,4 +31,12 @@ public class PostSpecification {
     public static Specification<Post> fromTime(LocalDateTime fromTime) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("publishTime"), fromTime));
     }
+
+    public static Specification<Post> likeSearchedTitle(String searchedTitle) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("title"), String.format("%%%s%%",searchedTitle)));
+    }
+
+    public static Specification<Post> isBlockedPost(Boolean isBlocked) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("isBlocked"), isBlocked);
+    }
 }

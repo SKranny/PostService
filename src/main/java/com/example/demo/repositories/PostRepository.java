@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -42,4 +43,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     @Query(value = "SELECT * FROM post WHERE publish_time < NOW() ORDER BY publish_time DESC", nativeQuery = true)
     List<Post> findPublishedPosts();
 
+    List<Post> findAllPostsByIsBlockedIsTrue();
+
+    List<Post> findAllPostsByIsBlockedAndIsDeletedIsFalse();
+    List<Post> findAllPostsByTimeBetween(LocalDate date1, LocalDate date2);
 }
