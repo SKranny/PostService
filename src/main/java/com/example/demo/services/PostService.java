@@ -334,38 +334,5 @@ public class PostService {
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
-    public Page<PostDTO> getAllPostsByIsBlockedIsTrue(String searchedTitle,Integer page){
-        if (searchedTitle!=null){
-            Specification<Post> spec = Specification
-                    .where(PostSpecification.likeSearchedTitle(searchedTitle))
-                    .and(PostSpecification.isBlockedPost(true));
-            Page<Post> posts = postRepository.findAll(spec,PageRequest.of(page,20));
-            return new PageImpl<>(posts.stream()
-                    .map(postMapper::toDTO)
-                    .collect(Collectors.toList()));
-        }
-        return new PageImpl<>(postRepository.findAllPostsByIsBlockedIsTrue()
-                .stream()
-                .map(postMapper::toDTO)
-                .collect(Collectors.toList()));
-    }
-
-    public Page<PostDTO> getAllActivePosts(String searchedTitle,Integer page){
-        if (searchedTitle!=null){
-            Specification<Post> spec = Specification
-                    .where(PostSpecification.likeSearchedTitle(searchedTitle))
-                    .and(PostSpecification.isBlockedPost(false))
-                    .and(PostSpecification.isDeletePost(false));
-            Page<Post> posts = postRepository.findAll(spec,PageRequest.of(page,20));
-            return new PageImpl<>(posts.stream()
-                    .map(postMapper::toDTO)
-                    .collect(Collectors.toList()));
-        }
-        return new PageImpl<>(postRepository.findAllPostsByIsBlockedAndIsDeletedIsFalse()
-                .stream()
-                .map(postMapper::toDTO)
-                .collect(Collectors.toList()));
-    }
 }
 

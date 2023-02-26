@@ -42,9 +42,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     @Query(value = "SELECT * FROM post WHERE publish_time < NOW() ORDER BY publish_time DESC", nativeQuery = true)
     List<Post> findPublishedPosts();
-
-    List<Post> findAllPostsByIsBlockedIsTrue();
-
-    List<Post> findAllPostsByIsBlockedAndIsDeletedIsFalse();
     List<Post> findAllPostsByTimeBetween(LocalDate date1, LocalDate date2);
 }

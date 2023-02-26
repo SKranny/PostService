@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.post.CreatePostRequest;
 import com.example.demo.dto.post.UpdatePostRequest;
+import com.example.demo.feign.BetweenDataRequest;
 import com.example.demo.services.PostService;
 import dto.postDto.PostDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -135,25 +136,8 @@ public class PostController {
         return postService.getAllPosts();
     }
 
-    @GetMapping("/allPostPage")
-    public Page<PostDTO> getAllPosts(
-            @RequestParam String searchedTitle,
-            @RequestParam(value = "page", defaultValue = "0", required = false)Integer page){
-        return postService.getAllPosts(searchedTitle, page);
-    }
-
     @GetMapping("/allPostBetween")
     public List<PostDTO> getAllPostsByTimeBetween(BetweenDataRequest request){
         return postService.getAllPostsByTimeBetween(request.getDate1(),request.getDate2());
-    }
-
-    @GetMapping("/allBlocked")
-    public Page<PostDTO> getAllPostsByIsBlockedIsTrue(@RequestParam String searchedTitle,@RequestParam Integer page){
-        return postService.getAllPostsByIsBlockedIsTrue(searchedTitle,page);
-    }
-
-    @GetMapping("/getActive")
-    public Page<PostDTO> getAllActivePosts(@RequestParam String searchedTitle, @RequestParam Integer page){
-        return postService.getAllActivePosts(searchedTitle,page);
     }
 }
