@@ -26,6 +26,7 @@ import security.dto.TokenData;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,10 +82,10 @@ public class PostService {
     }
 
     public void createPost(CreatePostRequest req, TokenData tokenData){
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("Europe/Moscow"));
         PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time)?
                 PostType.POSTED : PostType.SCHEDULED;
-        LocalDateTime publishTime = req.getPublishTime() == null ? time : req.getPublishTime();
+        ZonedDateTime publishTime = req.getPublishTime() == null ? time : req.getPublishTime();
         PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
         Post post = Post.builder()
                 .title(req.getTitle())
