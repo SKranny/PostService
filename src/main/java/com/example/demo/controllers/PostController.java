@@ -149,12 +149,16 @@ public class PostController {
         return postService.getAllPostsByTimeBetween(request.getDate1(),request.getDate2());
     }
     @GetMapping("/allBlocked")
-    public Page<PostDTO> getAllPostsByIsBlockedIsTrue(@RequestParam String searchedTitle,@RequestParam Integer page){
+    public Page<PostDTO> getAllPostsByIsBlockedIsTrue(
+            @RequestParam String searchedTitle,
+            @RequestParam(value = "page", defaultValue = "0", required = false) Integer page){
       return postService.getAllPostsByIsBlockedIsTrue(searchedTitle,page);
     }
 
     @GetMapping("/getActive")
-    public Page<PostDTO> getAllActivePosts(@RequestParam String searchedTitle, @RequestParam Integer page){
+    public Page<PostDTO> getAllActivePosts(
+            @RequestParam String searchedTitle,
+            @RequestParam(value = "page", defaultValue = "0", required = false) Integer page){
         return postService.getAllActivePosts(searchedTitle,page);
     }
 }
