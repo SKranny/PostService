@@ -31,6 +31,7 @@ public class Comment {
     private Boolean isDelete;
     private Boolean myLike;
     private String imagepath;
+
     @ManyToMany(mappedBy = "comments")
     private Set<CommentLike> commentLikes = new HashSet<>();
 }

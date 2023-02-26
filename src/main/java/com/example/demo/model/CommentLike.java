@@ -12,7 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "post_likes")
+@Table(name = "comment_likes")
 public class CommentLike {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comment_like_id_gen")
@@ -21,11 +21,11 @@ public class CommentLike {
     Long id;
     Long userId;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinTable(
-            name = "like2comment",
-            joinColumns = { @JoinColumn(name = "id") },
+            name = "comment2like",
+            joinColumns = { @JoinColumn(name = "comment_like_id") },
             inverseJoinColumns = { @JoinColumn(name = "comment_id") }
     )
-    Set<Post> comments = new HashSet<>();
+    private Set<Comment> comments = new HashSet<>();
 }

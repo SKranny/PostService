@@ -42,8 +42,8 @@ public class CommentController {
     @Operation(summary = "Получить все комментарии")
     @GetMapping("{id}/comment")
     @ResponseBody
-    public List<CommentDTO> getAllComments(@PathVariable Long id){
-        return commentService.getAllComments(id);
+    public List<CommentDTO> getAllComments(@PathVariable Long id, TokenAuthentication authentication){
+        return commentService.getAllComments(id, authentication.getTokenData().getEmail());
     }
 
     @Operation(summary = "Создать комментарий")
@@ -58,15 +58,15 @@ public class CommentController {
     @Operation(summary = "Поcтавить лайк на комментарий")
     @PostMapping("/{id}/comment/{commentId}/like")
     @ResponseBody
-    public void likePost(@PathVariable Long postId, @PathVariable Long commentId, TokenAuthentication authentication){
-        commentService.likeComment(postId, commentId, authentication);
+    public void likeComment(@PathVariable Long id, @PathVariable Long commentId, TokenAuthentication authentication){
+        commentService.likeComment(id, commentId, authentication);
     }
 
     @Operation(summary = "Удалить лайк с комментария")
     @DeleteMapping("/{id}/comment/{commentId}/like")
     @ResponseBody
-    public void deleteLikeFromPost(@PathVariable Long postId, @PathVariable Long commentId, TokenAuthentication authentication){
-        commentService.deleteLikeFromComment(postId, commentId, authentication);
+    public void deleteLikeFromComment(@PathVariable Long id, @PathVariable Long commentId, TokenAuthentication authentication){
+        commentService.deleteLikeFromComment(id, commentId, authentication);
     }
 
 }

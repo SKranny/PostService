@@ -8,22 +8,28 @@ import com.example.demo.feign.FriendService;
 import com.example.demo.feign.PersonService;
 import com.example.demo.dto.post.CreatePostRequest;
 import com.example.demo.mappers.PostMapper;
-import com.example.demo.model.Post;
-import com.example.demo.model.PostLike;
-import com.example.demo.model.Tag;
+import com.example.demo.model.*;
+import com.example.demo.repositories.CommentRepository;
 import com.example.demo.repositories.PostLikeRepository;
 import com.example.demo.repositories.PostRepository;
 import com.example.demo.repositories.TagRepository;
+import com.example.demo.repositories.specifications.PostSpecification;
+import constants.NotificationType;
+import dto.notification.ContentDTO;
 import dto.postDto.PostDTO;
+import dto.postDto.PostNotificationRequest;
 import dto.userDto.PersonDTO;
+import kafka.annotation.SubmitToKafka;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import security.TokenAuthentication;
 import security.dto.TokenData;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -40,6 +46,7 @@ public class PostService {
     private final PostMapper postMapper;
     private final FriendService friendService;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
 
     public Post findPostById(Long postId, Long personId) {
         return postRepository.findByIdAndAuthorId(postId, personId)
@@ -51,8 +58,13 @@ public class PostService {
                 .orElseThrow(() -> new PostException("Post with the id doesn't exist", HttpStatus.BAD_REQUEST));
     }
 
-    public PostDTO findById(Long id) {
-        return postMapper.toDTO(findPostById(id));
+    public PostDTO findById(Long id, String email) {
+        PostDTO postDTO = postMapper.toDTO(findPostById(id));
+        PersonDTO personDTO = personService.getPersonDTOByEmail(email);
+        postDTO.setCommentAmount(commentRepository.getCommentsCount(id));
+        postDTO.setLikeAmount(postLikeRepository.getLikesCount(id));
+        postDTO.setMyLike(postLikeRepository.findByPostIdAndUserId(id, personDTO.getId()).isPresent());
+        return postDTO;
     }
 
     public PostDTO editPost(UpdatePostRequest req, TokenData tokenData) {
@@ -68,7 +80,6 @@ public class PostService {
         } else {
             post.setTags(new HashSet<>());
         }
-
         return postMapper.toDTO(postRepository.save(post));
     }
 
@@ -91,12 +102,23 @@ public class PostService {
                 .title(req.getTitle())
                 .postText(req.getText())
                 .authorId(user.getId())
-                .time(time)
+                .time(now)
                 .type(postType)
+                .myLike(false)
                 .publishTime(publishTime)
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
         postRepository.save(post);
+        createNotification(post);
+    }
+
+    private LocalDateTime setPublishTime(LocalDateTime currentTime, CreatePostRequest req){
+        if (req.getPublishTime() == null){
+            return currentTime;
+        } else if (req.getPublishTime().isAfter(currentTime)) {
+            return req.getPublishTime();
+        }
+        else throw new PostException("Publish time can't be before current time", HttpStatus.BAD_REQUEST);
     }
 
     public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable) {
@@ -104,12 +126,16 @@ public class PostService {
     }
 
     public Page<PostDTO> getAllPostsByUser(Long id, Pageable pageable) {
-        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id, LocalDateTime.now(), pageable).get()
+        LocalDateTime time = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id, time, pageable).get()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
                         setTypePosted(post);
                     }
                     PostDTO postDTO = postMapper.toDTO(post);
+                    postDTO.setLikeAmount(postLikeRepository.getLikesCount(postDTO.getId()));
+                    postDTO.setCommentAmount(commentRepository.getCommentsCount(postDTO.getId()));
+                    postDTO.setMyLike(postLikeRepository.findByPostIdAndUserId(postDTO.getId(), id).isPresent());
                     return postDTO;
                 })
                 .collect(Collectors.toList());
@@ -122,10 +148,19 @@ public class PostService {
         return post;
     }
 
+    public Set<Long> findAllUsersBySubstringsInFirstOrLastNames(String authorSubstringsInNames) {
+        String[] words = authorSubstringsInNames.split("\\s");
+        Set<PersonDTO> personDTOSet = personService.searchAllBySubstringInFirstOrLastName(words[0]);
+        for (int i = 1; i < words.length; i++) {
+            personDTOSet.retainAll(personService.searchAllBySubstringInFirstOrLastName(words[i]));
+        }
+        return personDTOSet.stream().map(PersonDTO::getId).collect(Collectors.toSet());
+    }
+
     public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
-                                      Boolean isDelete, List<String> tags, String range,
+                                      Boolean isDelete, List<String> tags, String range, String authorSubStringsInNames,
                                       Integer page, Integer offset) {
-        Pageable pageable = PageRequest.of(page, offset, Sort.by("time").descending());
+        Pageable pageable = PageRequest.of(page, offset, Sort.by("publishTime").descending());
 
         if (range != null) {
             switch (range) {
@@ -155,22 +190,37 @@ public class PostService {
                         setTypePosted(post);
                     }
                     PostDTO postDTO = postMapper.toDTO(post);
+                    postDTO.setCommentAmount(commentRepository.getCommentsCount(postDTO.getId()));
+                    postDTO.setLikeAmount(postLikeRepository.getLikesCount(postDTO.getId()));
                     return postDTO;
                 })
                 .collect(Collectors.toList());
 
+        if (authorSubStringsInNames != null && !authorSubStringsInNames.isBlank()) {
+            Set<Long> usersList = findAllUsersBySubstringsInFirstOrLastNames(authorSubStringsInNames);
+            posts = posts.stream().filter(p -> usersList.contains(p.getAuthorId())).collect(Collectors.toList());
+        }
+
         if (tags == null || tags.isEmpty()) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
         }
+
+        List<PostDTO> finalPosts = posts;
         List<PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()
                 .flatMap(p -> p.getPosts().stream())
                 .distinct()
                 .map(postMapper::toDTO)
-                .filter(posts::contains)
+                .filter(p ->
+                        {
+                            for (PostDTO post : finalPosts) {
+                                if (Objects.equals(post.getId(), p.getId())) return true;
+                            }
+                            return false;
+                        }
+                )
                 .collect(Collectors.toList());
         return new PageImpl<>(postsDTOwithTags, pageable, postsDTOwithTags.size());
     }
-
 
     private Tag getOrBuildTag(String text) {
         return tagRepository.findByTagIgnoreCase(text)
@@ -207,23 +257,45 @@ public class PostService {
 
     }
 
-    public void likePost(Long postId, TokenAuthentication authentication) {
-        Post post = postRepository.findById(postId).get();
-        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
-        if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isEmpty()) {
-            post.setMyLike(post.getAuthorId() == personDTO.getId());
-            postRepository.save(post);
-
-            PostLike postLike = new PostLike();
-            postLike.setUserId(personDTO.getId());
-            postLike.getPosts().add(post);
-            postLikeRepository.save(postLike);
-        } else throw new PostException("Already liked", HttpStatus.BAD_REQUEST);
-
+    @SubmitToKafka(topic = "Post")
+    public PostNotificationRequest createNotification(Post post){
+        return PostNotificationRequest.builder()
+                .authorId(post.getAuthorId())
+                .title(post.getTitle())
+                .type(NotificationType.POST)
+                .content(ContentDTO.builder()
+                        .text(post.getPostText())
+                        .attaches(new ArrayList<>())
+                        .build())
+                .friendsId(friendService.getFriendId())
+                .build();
     }
 
-    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication) {
+    public void likePost(Long postId, TokenAuthentication authentication){
+        Post post = postRepository.findById(postId).get();
+        PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
+        if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isEmpty()){
+            if (post.getAuthorId() == personDTO.getId()){
+                setMyLike(true, post);
+            }
+            newPostLike(personDTO, post);
+        }
+        else throw new PostException("Already liked", HttpStatus.BAD_REQUEST);
+    }
 
+    private void newPostLike(PersonDTO personDTO, Post post){
+        PostLike postLike = new PostLike();
+        postLike.setUserId(personDTO.getId());
+        postLike.getPosts().add(post);
+        postLikeRepository.save(postLike);
+    }
+
+    private void setMyLike(Boolean isMyLike, Post post){
+        post.setMyLike(isMyLike);
+        postRepository.save(post);
+    }
+
+    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
         Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
         if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isPresent()) {
@@ -234,6 +306,33 @@ public class PostService {
             PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).get();
             postLikeRepository.delete(postLike);
         } else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
+    }
+
+    public List<PostDTO> getAllDelayedPosts(Long id, Integer page, Integer offset) {
+        Pageable pageable = PageRequest.of(page, offset, Sort.by("publishTime").descending());
+        return postRepository.findAllByAuthorIdAndType( id, PostType.SCHEDULED, pageable).stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getAllPosts(){
+        return postRepository.findAll().stream().map(postMapper::toDTO).collect(Collectors.toList());
+    }
+
+    public Page<PostDTO> getAllPosts(String searchedTitle, Integer page){
+        Specification<Post> spec = Specification.where(null);
+        if (searchedTitle != null){
+            spec = spec.and(PostSpecification.likeSearchedTitle(searchedTitle));
+        }
+        Page<Post> posts = postRepository.findAll(spec, PageRequest.of(page - 1, 20));
+        return new PageImpl<>(posts.stream().map(postMapper::toDTO).collect(Collectors.toList()));
+    }
+
+    public List<PostDTO> getAllPostsByTimeBetween(LocalDate date1, LocalDate date2){
+        return postRepository.findAllPostsByTimeBetween(date1,date2)
+                .stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
 

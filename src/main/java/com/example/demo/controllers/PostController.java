@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.post.CreatePostRequest;
 import com.example.demo.dto.post.UpdatePostRequest;
+import com.example.demo.feign.BetweenDataRequest;
 import com.example.demo.services.PostService;
 import dto.postDto.PostDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,15 +66,17 @@ public class PostController {
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromTime,
             @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete,
             @RequestParam(name = "tags", required = false) List<String> tags,
-            @RequestParam(name = "range", required = false) String range)
+            @RequestParam(name = "range", required = false) String range,
+            @RequestParam(name = "author", required = false) String authorSubStrings)
     {
-        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete, tags, range, page, offset);
+        return postService.findAllPosts(withFriends, toTime, fromTime, isDelete, tags, range, authorSubStrings,
+                                        page, offset);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Получение постов по ID")
-    public PostDTO getPostById(@PathVariable Long id) {
-        return postService.findById(id);
+    public PostDTO getPostById(@PathVariable Long id, TokenAuthentication authentication) {
+        return postService.findById(id, authentication.getTokenData().getEmail());
     }
 
     @Operation(summary = "Получение списка своих сообщений")
@@ -118,6 +121,23 @@ public class PostController {
         postService.deleteLikeFromPost(id, authentication);
     }
 
+    @Operation(summary = "Получение списка всех отложенных постов пользователя")
+    @GetMapping("/user/{id}/delayed")
+    public List<PostDTO> getAllDelayedPosts(@PathVariable Long id,
+                                              @Valid @Min(0) @RequestParam(name = "page", defaultValue = "0",
+                                                      required = false) Integer page,
+                                              @Valid @Min(0) @RequestParam(name = "offset",
+                                                      defaultValue = "20", required = false) Integer offset) {
+        return postService.getAllDelayedPosts(id, page, offset);
+    }
 
+    @GetMapping("/allPostList")
+    public List<PostDTO> getAllPosts(){
+        return postService.getAllPosts();
+    }
 
+    @GetMapping("/allPostBetween")
+    public List<PostDTO> getAllPostsByTimeBetween(BetweenDataRequest request){
+        return postService.getAllPostsByTimeBetween(request.getDate1(),request.getDate2());
+    }
 }

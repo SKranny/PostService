@@ -1,7 +1,7 @@
 package com.example.demo.repositories;
 
+import com.example.demo.constants.PostType;
 import com.example.demo.model.Post;
-import com.example.demo.model.Tag;
 import com.example.demo.repositories.specifications.PostSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,17 +12,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor {
     //Page<Post> findAllByAuthorIdAndIsDeleteIsFalseOrderByTimeDesc(Long author_id, Pageable pageable);
     Page<Post> findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(Long author_id, LocalDateTime now, Pageable pageable);
     Page<Post> findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(Collection<Long> authorId, Pageable pageable);
+    Page<Post> findAllByAuthorIdAndType(Long id, PostType postType, Pageable pageable);
     Optional<Post> findByIdAndAuthorId(Long id, Long authorId);
 
     default List<Post> findAllByFilter(Boolean withFriends, Boolean isDelete, LocalDateTime now,
@@ -41,5 +42,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     @Query(value = "SELECT * FROM post WHERE publish_time < NOW() ORDER BY publish_time DESC", nativeQuery = true)
     List<Post> findPublishedPosts();
-
+    List<Post> findAllPostsByTimeBetween(LocalDate date1, LocalDate date2);
 }
