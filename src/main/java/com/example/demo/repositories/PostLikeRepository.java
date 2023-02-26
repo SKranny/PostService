@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface PostLikeRepository extends JpaRepository <PostLike, Long> {
 
     @Query(value = "SELECT pl.* FROM post_likes pl JOIN post2like p2l ON p2l.post_like_id = pl.id " +
-            "JOIN post p ON p2l.post_id = p.id WHERE p.id = :postId AND p.author_id = :userId", nativeQuery = true)
+            "JOIN post p ON p2l.post_id = p.id WHERE p.id = :postId AND pl.user_id = :userId", nativeQuery = true)
     Optional<PostLike> findByPostIdAndUserId(@Param("postId") Long postId, @Param("userId") Long userId);
 
 

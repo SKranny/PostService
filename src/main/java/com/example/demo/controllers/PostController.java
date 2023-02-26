@@ -74,8 +74,8 @@ public class PostController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Получение постов по ID")
-    public PostDTO getPostById(@PathVariable Long id) {
-        return postService.findById(id);
+    public PostDTO getPostById(@PathVariable Long id, TokenAuthentication authentication) {
+        return postService.findById(id, authentication.getTokenData().getEmail());
     }
 
     @Operation(summary = "Получение списка своих сообщений")
