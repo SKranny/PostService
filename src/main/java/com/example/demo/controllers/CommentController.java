@@ -51,6 +51,7 @@ public class CommentController {
     public List<CommentDTO> getAllCommentsByText(@PathVariable Long postId, @PathVariable String text) {
         return commentService.getAllCommentsByText(postId, text);
     }
+
     @Operation(summary = "Создать комментарий")
     @PostMapping("/{id}/comment")
     @ResponseBody
