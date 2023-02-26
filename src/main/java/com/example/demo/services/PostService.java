@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -102,7 +103,7 @@ public class PostService {
                 .title(req.getTitle())
                 .postText(req.getText())
                 .authorId(user.getId())
-                .time(now)
+                .time(time)
                 .type(postType)
                 .myLike(false)
                 .publishTime(publishTime)
@@ -115,8 +116,8 @@ public class PostService {
     private LocalDateTime setPublishTime(LocalDateTime currentTime, CreatePostRequest req){
         if (req.getPublishTime() == null){
             return currentTime;
-        } else if (req.getPublishTime().isAfter(currentTime)) {
-            return req.getPublishTime();
+        } else if (req.getPublishTime().isAfter(ChronoZonedDateTime.from(currentTime))) {
+            return req.getPublishTime().toLocalDateTime();
         }
         else throw new PostException("Publish time can't be before current time", HttpStatus.BAD_REQUEST);
     }
