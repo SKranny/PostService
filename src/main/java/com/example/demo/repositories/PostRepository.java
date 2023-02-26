@@ -3,7 +3,6 @@ package com.example.demo.repositories;
 import com.example.demo.model.Post;
 import com.example.demo.repositories.specifications.PostSpecification;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,7 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     List<Post> findAllPostsByIsBlockedIsTrue();
 
-    List<Post> findAllPostsByIsBlockedAndIsDeletedIsFalse();
+    List<Post> findAllPostsByIsBlockedIsFalseAndIsDeleteIsFalse();
     List<Post> findAllPostsByTimeBetween(LocalDate date1, LocalDate date2);
 
 }

@@ -257,7 +257,7 @@ public class PostService {
                     .map(postMapper::toDTO)
                     .collect(Collectors.toList()));
         }
-        return new PageImpl<>(postRepository.findAllPostsByIsBlockedAndIsDeletedIsFalse()
+        return new PageImpl<>(postRepository.findAllPostsByIsBlockedIsFalseAndIsDeleteIsFalse()
                 .stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList()));
