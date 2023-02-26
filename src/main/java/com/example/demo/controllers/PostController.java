@@ -18,6 +18,7 @@ import security.TokenAuthentication;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -131,6 +132,13 @@ public class PostController {
         return postService.getAllDelayedPosts(id, page, offset);
     }
 
+    @GetMapping("/allPostPage")
+    public Page<PostDTO> getAllPosts(
+            @RequestParam String searchedTitle,
+            @RequestParam(value = "page", defaultValue = "0", required = false)Integer page){
+        return postService.getAllPosts(searchedTitle, page);
+    }
+
     @GetMapping("/allPostList")
     public List<PostDTO> getAllPosts(){
         return postService.getAllPosts();
@@ -139,5 +147,14 @@ public class PostController {
     @GetMapping("/allPostBetween")
     public List<PostDTO> getAllPostsByTimeBetween(BetweenDataRequest request){
         return postService.getAllPostsByTimeBetween(request.getDate1(),request.getDate2());
+    }
+    @GetMapping("/allBlocked")
+    public Page<PostDTO> getAllPostsByIsBlockedIsTrue(@RequestParam String searchedTitle,@RequestParam Integer page){
+      return postService.getAllPostsByIsBlockedIsTrue(searchedTitle,page);
+    }
+
+    @GetMapping("/getActive")
+    public Page<PostDTO> getAllActivePosts(@RequestParam String searchedTitle, @RequestParam Integer page){
+        return postService.getAllActivePosts(searchedTitle,page);
     }
 }
