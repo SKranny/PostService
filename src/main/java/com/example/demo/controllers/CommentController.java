@@ -20,7 +20,6 @@ import java.util.List;
 @RequestMapping("/api/v1/post")
 @Tag(name="Comment Service", description="Сервис работы с комментариями")
 public class CommentController {
-
     private final CommentService commentService;
 
     @Operation(summary = "Редактирование комментария по ID")
