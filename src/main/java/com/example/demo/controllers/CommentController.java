@@ -46,6 +46,12 @@ public class CommentController {
         return commentService.getAllComments(id, authentication.getTokenData().getEmail());
     }
 
+    @Operation(summary = "Получить все комментарии по тексту")
+    @GetMapping("{postId}/comments/{text}")
+    @ResponseBody
+    public List<CommentDTO> getAllCommentsByText(@PathVariable Long postId, @PathVariable String text) {
+        return commentService.getAllCommentsByText(postId, text);
+    }
     @Operation(summary = "Создать комментарий")
     @PostMapping("/{id}/comment")
     @ResponseBody

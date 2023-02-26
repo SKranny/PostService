@@ -33,6 +33,8 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,7 +69,7 @@ public class PostService {
         return postDTO;
     }
 
-    public PostDTO editPost(UpdatePostRequest req, TokenData tokenData){
+    public PostDTO editPost(UpdatePostRequest req, TokenData tokenData) {
         PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
         Post post = postRepository.findByIdAndAuthorId(req.getPostId(), user.getId()).get();
         post.setTitle(req.getTitle());
@@ -83,7 +85,7 @@ public class PostService {
         return postMapper.toDTO(postRepository.save(post));
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         Post post = findPostById(id);
 
         post.setIsDelete(true);
@@ -92,17 +94,17 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public void createPost(CreatePostRequest req, TokenData tokenData){
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-        PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(now)?
+    public void createPost(CreatePostRequest req, TokenData tokenData) {
+        ZonedDateTime time = ZonedDateTime.now();
+        PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time) ?
                 PostType.POSTED : PostType.SCHEDULED;
-        LocalDateTime publishTime = setPublishTime(now, req);
+        ZonedDateTime publishTime = req.getPublishTime() == null ? time : req.getPublishTime();
         PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
         Post post = Post.builder()
                 .title(req.getTitle())
                 .postText(req.getText())
                 .authorId(user.getId())
-                .time(now)
+                .time(time)
                 .type(postType)
                 .myLike(false)
                 .publishTime(publishTime)
@@ -115,13 +117,13 @@ public class PostService {
     private LocalDateTime setPublishTime(LocalDateTime currentTime, CreatePostRequest req){
         if (req.getPublishTime() == null){
             return currentTime;
-        } else if (req.getPublishTime().isAfter(currentTime)) {
-            return req.getPublishTime();
+        } else if (req.getPublishTime().isAfter(ChronoZonedDateTime.from(currentTime))) {
+            return req.getPublishTime().toLocalDateTime();
         }
         else throw new PostException("Publish time can't be before current time", HttpStatus.BAD_REQUEST);
     }
 
-    public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable){
+    public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable) {
         return getAllPostsByUser(personService.getPersonDTOByEmail(email).getId(), pageable);
     }
 
@@ -142,7 +144,7 @@ public class PostService {
         return new PageImpl<>(posts);
     }
 
-    private Post setTypePosted(Post post){
+    private Post setTypePosted(Post post) {
         post.setType(PostType.POSTED);
         postRepository.save(post);
         return post;
@@ -219,7 +221,7 @@ public class PostService {
                         }
                 )
                 .collect(Collectors.toList());
-        return new PageImpl<>(postsDTOwithTags, pageable,postsDTOwithTags.size());
+        return new PageImpl<>(postsDTOwithTags, pageable, postsDTOwithTags.size());
     }
 
     private Tag getOrBuildTag(String text) {
@@ -249,7 +251,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<PostDTO> getAllFriendsNews(Pageable pageable){
+    public List<PostDTO> getAllFriendsNews(Pageable pageable) {
         List<Long> friendsIds = friendService.getFriendId();
         return postRepository.findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(friendsIds, pageable).stream()
                 .map(postMapper::toDTO)
@@ -299,14 +301,13 @@ public class PostService {
         Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
         if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isPresent()) {
-            if (post.getAuthorId() == personDTO.getId()){
+            if (post.getAuthorId() == personDTO.getId()) {
                 post.setMyLike(false);
                 postRepository.save(post);
             }
             PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).get();
             postLikeRepository.delete(postLike);
-        }
-        else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
+        } else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
     }
 
     public List<PostDTO> getAllDelayedPosts(Long id, Integer page, Integer offset) {

@@ -1,10 +1,11 @@
 package com.example.demo.model;
 
 import com.example.demo.constants.PostType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,9 +23,11 @@ public class Post {
     @Column(name = "id")
     private Long id;
 
-    private LocalDateTime time;
 
-    private LocalDateTime publishTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime time;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime publishTime;
 
     private Long authorId;
 
