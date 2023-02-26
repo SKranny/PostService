@@ -8,9 +8,7 @@ import com.example.demo.feign.FriendService;
 import com.example.demo.feign.PersonService;
 import com.example.demo.dto.post.CreatePostRequest;
 import com.example.demo.mappers.PostMapper;
-import com.example.demo.model.Post;
-import com.example.demo.model.PostLike;
-import com.example.demo.model.Tag;
+import com.example.demo.model.*;
 import com.example.demo.repositories.CommentRepository;
 import com.example.demo.repositories.PostLikeRepository;
 import com.example.demo.repositories.PostRepository;
@@ -256,20 +254,27 @@ public class PostService {
         Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
         if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isEmpty()){
-            post.setMyLike(post.getAuthorId() == personDTO.getId());
-            postRepository.save(post);
-
-            PostLike postLike = new PostLike();
-            postLike.setUserId(personDTO.getId());
-            postLike.getPosts().add(post);
-            postLikeRepository.save(postLike);
+            if (post.getAuthorId() == personDTO.getId()){
+                setMyLike(true, post);
+            }
+            newPostLike(personDTO, post);
         }
         else throw new PostException("Already liked", HttpStatus.BAD_REQUEST);
+    }
 
+    private void newPostLike(PersonDTO personDTO, Post post){
+        PostLike postLike = new PostLike();
+        postLike.setUserId(personDTO.getId());
+        postLike.getPosts().add(post);
+        postLikeRepository.save(postLike);
+    }
+
+    private void setMyLike(Boolean isMyLike, Post post){
+        post.setMyLike(isMyLike);
+        postRepository.save(post);
     }
 
     public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
-
         Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
         if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isPresent()) {
