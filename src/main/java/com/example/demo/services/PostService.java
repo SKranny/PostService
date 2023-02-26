@@ -82,10 +82,7 @@ public class PostService {
     }
 
     public void createPost(CreatePostRequest req, TokenData tokenData) {
-        ZonedDateTime instant = ZonedDateTime.now();
-        ZonedDateTime time = instant.withZoneSameInstant(ZoneId.of("Europe/London"));
-
-
+        ZonedDateTime time = ZonedDateTime.now();
         PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time) ?
                 PostType.POSTED : PostType.SCHEDULED;
         ZonedDateTime publishTime = req.getPublishTime() == null ? time : req.getPublishTime();
