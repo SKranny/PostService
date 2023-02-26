@@ -22,6 +22,8 @@ public class Post {
     @SequenceGenerator(name = "post_id_gen", sequenceName = "post_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
+
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private ZonedDateTime time;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")

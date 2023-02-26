@@ -55,7 +55,7 @@ public class PostService {
         return postMapper.toDTO(findPostById(id));
     }
 
-    public PostDTO editPost(UpdatePostRequest req, TokenData tokenData){
+    public PostDTO editPost(UpdatePostRequest req, TokenData tokenData) {
         PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
         Post post = postRepository.findByIdAndAuthorId(req.getPostId(), user.getId()).get();
         post.setTitle(req.getTitle());
@@ -72,7 +72,7 @@ public class PostService {
         return postMapper.toDTO(postRepository.save(post));
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         Post post = findPostById(id);
 
         post.setIsDelete(true);
@@ -81,9 +81,12 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public void createPost(CreatePostRequest req, TokenData tokenData){
-        ZonedDateTime time = ZonedDateTime.now(ZoneId.of("Europe/Moscow"));
-        PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time)?
+    public void createPost(CreatePostRequest req, TokenData tokenData) {
+        ZonedDateTime instant = ZonedDateTime.now();
+        ZonedDateTime time = instant.withZoneSameInstant(ZoneId.of("Europe/London"));
+
+
+        PostType postType = req.getPublishTime() == null || req.getPublishTime().isBefore(time) ?
                 PostType.POSTED : PostType.SCHEDULED;
         ZonedDateTime publishTime = req.getPublishTime() == null ? time : req.getPublishTime();
         PersonDTO user = personService.getPersonDTOByEmail(tokenData.getEmail());
@@ -99,12 +102,12 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable){
+    public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable) {
         return getAllPostsByUser(personService.getPersonDTOByEmail(email).getId(), pageable);
     }
 
     public Page<PostDTO> getAllPostsByUser(Long id, Pageable pageable) {
-        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id,LocalDateTime.now(), pageable).get()
+        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id, LocalDateTime.now(), pageable).get()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
                         setTypePosted(post);
@@ -116,7 +119,7 @@ public class PostService {
         return new PageImpl<>(posts);
     }
 
-    private Post setTypePosted(Post post){
+    private Post setTypePosted(Post post) {
         post.setType(PostType.POSTED);
         postRepository.save(post);
         return post;
@@ -162,13 +165,13 @@ public class PostService {
         if (tags == null || tags.isEmpty()) {
             return new PageImpl<>(posts, PageRequest.of(page, offset), offset);
         }
-        List <PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()
+        List<PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()
                 .flatMap(p -> p.getPosts().stream())
                 .distinct()
                 .map(postMapper::toDTO)
                 .filter(posts::contains)
                 .collect(Collectors.toList());
-        return new PageImpl<>(postsDTOwithTags, pageable,postsDTOwithTags.size());
+        return new PageImpl<>(postsDTOwithTags, pageable, postsDTOwithTags.size());
     }
 
 
@@ -199,7 +202,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<PostDTO> getAllFriendsNews(Pageable pageable){
+    public List<PostDTO> getAllFriendsNews(Pageable pageable) {
         List<Long> friendsIds = friendService.getFriendId();
         return postRepository.findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(friendsIds, pageable).stream()
                 .map(postMapper::toDTO)
@@ -207,10 +210,10 @@ public class PostService {
 
     }
 
-    public void likePost(Long postId, TokenAuthentication authentication){
+    public void likePost(Long postId, TokenAuthentication authentication) {
         Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
-        if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isEmpty()){
+        if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isEmpty()) {
             post.setMyLike(post.getAuthorId() == personDTO.getId());
             postRepository.save(post);
 
@@ -218,24 +221,22 @@ public class PostService {
             postLike.setUserId(personDTO.getId());
             postLike.getPosts().add(post);
             postLikeRepository.save(postLike);
-        }
-        else throw new PostException("Already liked", HttpStatus.BAD_REQUEST);
+        } else throw new PostException("Already liked", HttpStatus.BAD_REQUEST);
 
     }
 
-    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication){
+    public void deleteLikeFromPost(Long postId, TokenAuthentication authentication) {
 
         Post post = postRepository.findById(postId).get();
         PersonDTO personDTO = personService.getPersonDTOByEmail(authentication.getTokenData().getEmail());
         if (postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).isPresent()) {
-            if (post.getAuthorId() == personDTO.getId()){
+            if (post.getAuthorId() == personDTO.getId()) {
                 post.setMyLike(false);
                 postRepository.save(post);
             }
             PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, personDTO.getId()).get();
             postLikeRepository.delete(postLike);
-        }
-        else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
+        } else throw new PostException("Not liked", HttpStatus.BAD_REQUEST);
     }
 }
 
