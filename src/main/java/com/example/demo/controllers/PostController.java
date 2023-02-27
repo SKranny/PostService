@@ -60,10 +60,8 @@ public class PostController {
             @Valid @Min(0) @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
             @Valid @Min(0) @RequestParam(name = "offset", defaultValue = "20", required = false) Integer offset,
             @RequestParam(name = "withFriends", defaultValue = "false", required = false) Boolean withFriends,
-            @RequestParam(name = "toTime", required = false)
-                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime toTime,
-            @RequestParam(name = "fromTime", required = false)
-                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fromTime,
+            @RequestParam(name = "toTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime toTime,
+            @RequestParam(name = "fromTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fromTime,
             @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete,
             @RequestParam(name = "tags", required = false) List<String> tags,
             @RequestParam(name = "range", required = false) String range,

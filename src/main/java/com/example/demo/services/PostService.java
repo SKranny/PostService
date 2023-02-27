@@ -109,7 +109,7 @@ public class PostService {
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
         postRepository.save(post);
-//        createNotification(post);
+        createNotification(post);
     }
 
     public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable) {
@@ -186,6 +186,7 @@ public class PostService {
                     postDTO.setLikeAmount(postLikeRepository.getLikesCount(postDTO.getId()));
                     return postDTO;
                 })
+                .sorted(Comparator.comparing(PostDTO::getPublishTime).reversed())
                 .collect(Collectors.toList());
 
         if (authorSubStringsInNames != null && !authorSubStringsInNames.isBlank()) {
@@ -315,7 +316,7 @@ public class PostService {
         if (searchedTitle != null){
             spec = spec.and(PostSpecification.likeSearchedTitle(searchedTitle));
         }
-        Page<Post> posts = postRepository.findAll(spec, PageRequest.of(page - 1, 20));
+        Page<Post> posts = postRepository.findAll(spec, PageRequest.of(page, 20));
         return new PageImpl<>(posts.stream().map(postMapper::toDTO).collect(Collectors.toList()));
     }
 
