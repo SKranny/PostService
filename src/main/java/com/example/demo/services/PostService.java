@@ -109,7 +109,7 @@ public class PostService {
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
         postRepository.save(post);
-        createNotification(post);
+//        createNotification(post);
     }
 
     public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable) {
