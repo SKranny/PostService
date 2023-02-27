@@ -118,7 +118,7 @@ public class PostService {
 
     public Page<PostDTO> getAllPostsByUser(Long id, Pageable pageable) {
         ZonedDateTime time = ZonedDateTime.now();
-        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id, time, pageable).get()
+        List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByPublishTimeDesc(id, time, pageable).get()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
                         setTypePosted(post);
@@ -242,7 +242,7 @@ public class PostService {
 
     public List<PostDTO> getAllFriendsNews(Pageable pageable) {
         List<Long> friendsIds = friendService.getFriendId();
-        return postRepository.findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(friendsIds, pageable).stream()
+        return postRepository.findByAuthorIdInAndIsDeleteIsFalseOrderByPublishTimeDesc(friendsIds, pageable).stream()
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
 

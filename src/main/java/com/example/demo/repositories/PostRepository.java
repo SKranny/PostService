@@ -18,8 +18,8 @@ import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor {
-    Page<Post> findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(Long author_id, ZonedDateTime now, Pageable pageable);
-    Page<Post> findByAuthorIdInAndIsDeleteIsFalseOrderByTimeDesc(Collection<Long> authorId, Pageable pageable);
+    Page<Post> findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByPublishTimeDesc(Long author_id, ZonedDateTime now, Pageable pageable);
+    Page<Post> findByAuthorIdInAndIsDeleteIsFalseOrderByPublishTimeDesc(Collection<Long> authorId, Pageable pageable);
     Page<Post> findAllByAuthorIdAndType(Long id, PostType postType, Pageable pageable);
     Optional<Post> findByIdAndAuthorId(Long id, Long authorId);
 
