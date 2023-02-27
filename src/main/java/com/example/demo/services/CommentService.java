@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import security.TokenAuthentication;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ public class CommentService {
 
     public CommentDTO addComment(Long postId, CommentRequest commentRequest, String userEmail){
         PersonDTO user = personService.getPersonDTOByEmail(userEmail);
-        LocalDateTime time = LocalDateTime.now();
+        ZonedDateTime time = ZonedDateTime.now();
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException("Post with the id doesn't exist"));
         Comment comment = Comment.builder()
@@ -56,13 +57,12 @@ public class CommentService {
 
 
     public void editComment(Long postId, Long commentId, CommentRequest commentRequest, Long id){
-        LocalDateTime time = LocalDateTime.now();
         Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
-                .map(c -> editComment(c, commentRequest.getText(), time))
+                .map(c -> editComment(c, commentRequest.getText(), ZonedDateTime.now()))
                 .orElseThrow(() -> new CommentException("Comment with the id doesn't exist", HttpStatus.BAD_REQUEST));
         commentRepository.save(comment);
     }
-    private Comment editComment(Comment comment, String text, LocalDateTime time){
+    private Comment editComment(Comment comment, String text, ZonedDateTime time){
         comment.setText(text);
         comment.setEditTime(time);
         return comment;

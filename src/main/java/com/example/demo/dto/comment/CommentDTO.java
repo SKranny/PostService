@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @Builder
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 public class CommentDTO {
     private Long id;
     private Long postId;
-    private LocalDateTime time;
-    private LocalDateTime editTime;
+    private ZonedDateTime time;
+    private ZonedDateTime editTime;
     private Long authorId;
     private String text;
     private boolean isBlocked;

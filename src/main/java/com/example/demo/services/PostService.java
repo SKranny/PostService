@@ -16,7 +16,6 @@ import com.example.demo.repositories.TagRepository;
 import com.example.demo.repositories.specifications.PostSpecification;
 import constants.NotificationType;
 import dto.notification.ContentDTO;
-import com.example.demo.repositories.specifications.PostSpecification;
 import dto.postDto.PostDTO;
 import dto.postDto.PostNotificationRequest;
 import dto.userDto.PersonDTO;
@@ -34,7 +33,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,16 +109,7 @@ public class PostService {
                 .tags(getOrBuildTags(req.getTags()))
                 .build();
         postRepository.save(post);
-        createNotification(post);
-    }
-
-    private LocalDateTime setPublishTime(LocalDateTime currentTime, CreatePostRequest req){
-        if (req.getPublishTime() == null){
-            return currentTime;
-        } else if (req.getPublishTime().isAfter(ChronoZonedDateTime.from(currentTime))) {
-            return req.getPublishTime().toLocalDateTime();
-        }
-        else throw new PostException("Publish time can't be before current time", HttpStatus.BAD_REQUEST);
+//        createNotification(post);
     }
 
     public Page<PostDTO> getAllPostsByUser(String email, Pageable pageable) {
@@ -128,7 +117,7 @@ public class PostService {
     }
 
     public Page<PostDTO> getAllPostsByUser(Long id, Pageable pageable) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+        ZonedDateTime time = ZonedDateTime.now();
         List<PostDTO> posts = postRepository.findAllByAuthorIdAndIsDeleteIsFalseAndPublishTimeBeforeOrderByTimeDesc(id, time, pageable).get()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
@@ -159,7 +148,7 @@ public class PostService {
         return personDTOSet.stream().map(PersonDTO::getId).collect(Collectors.toSet());
     }
 
-    public Page<PostDTO> findAllPosts(Boolean withFriends, LocalDateTime toTime, LocalDateTime fromTime,
+    public Page<PostDTO> findAllPosts(Boolean withFriends, ZonedDateTime toTime, ZonedDateTime fromTime,
                                       Boolean isDelete, List<String> tags, String range, String authorSubStringsInNames,
                                       Integer page, Integer offset) {
         Pageable pageable = PageRequest.of(page, offset, Sort.by("publishTime").descending());
@@ -167,26 +156,27 @@ public class PostService {
         if (range != null) {
             switch (range) {
                 case ("year"):
-                    toTime = LocalDateTime.now();
-                    fromTime = LocalDateTime.now().minusYears(1);
+                    toTime = ZonedDateTime.now();
+                    fromTime = ZonedDateTime.now().minusYears(1);
                     break;
                 case ("month"):
-                    toTime = LocalDateTime.now();
-                    fromTime = LocalDateTime.now().minusMonths(1);
+                    toTime = ZonedDateTime.now();
+                    fromTime = ZonedDateTime.now().minusMonths(1);
                     break;
                 case ("week"):
-                    toTime = LocalDateTime.now();
-                    fromTime = LocalDateTime.now().minusWeeks(1);
+                    toTime = ZonedDateTime.now();
+                    fromTime = ZonedDateTime.now().minusWeeks(1);
                     break;
                 case ("alltime"):
-                    toTime = LocalDateTime.now();
-                    fromTime = LocalDateTime.of(1, 1, 1, 1, 1, 1, 1);
+                    toTime = ZonedDateTime.now();
+                    fromTime = LocalDateTime.of(1, 1, 1, 1, 1, 1, 1)
+                            .atZone(ZoneId.of("UTC"));
                     break;
             }
         }
 
         List<PostDTO> posts = postRepository.findAllByFilter(withFriends,
-                        isDelete, LocalDateTime.now(), toTime, fromTime).stream()
+                        isDelete, ZonedDateTime.now(), toTime, fromTime).stream()
                 .map(post -> {
                     if (post.getType() == PostType.SCHEDULED) {
                         setTypePosted(post);
@@ -200,7 +190,10 @@ public class PostService {
 
         if (authorSubStringsInNames != null && !authorSubStringsInNames.isBlank()) {
             Set<Long> usersList = findAllUsersBySubstringsInFirstOrLastNames(authorSubStringsInNames);
-            posts = posts.stream().filter(p -> usersList.contains(p.getAuthorId())).collect(Collectors.toList());
+            posts = posts.stream()
+                    .filter(p -> usersList.contains(p.getAuthorId()))
+                    .sorted(Comparator.comparing(PostDTO::getPublishTime).reversed())
+                    .collect(Collectors.toList());
         }
 
         if (tags == null || tags.isEmpty()) {
@@ -208,20 +201,13 @@ public class PostService {
         }
 
         List<PostDTO> finalPosts = posts;
-        List<PostDTO> postsDTOwithTags = tagRepository.findAllByTagIn(tags).stream()
-                .flatMap(p -> p.getPosts().stream())
-                .distinct()
-                .map(postMapper::toDTO)
-                .filter(p ->
-                        {
-                            for (PostDTO post : finalPosts) {
-                                if (Objects.equals(post.getId(), p.getId())) return true;
-                            }
-                            return false;
-                        }
-                )
-                .collect(Collectors.toList());
-        return new PageImpl<>(postsDTOwithTags, pageable, postsDTOwithTags.size());
+        return new PageImpl<>(tagRepository.findAllByTagIn(tags).stream().map(Tag::getPosts)
+                    .flatMap(Collection::stream).distinct()
+                    .map(postMapper::toDTO)
+                    .filter(p -> finalPosts.stream().map(PostDTO::getId).collect(Collectors.toList()).contains(p.getId()))
+                    .sorted(Comparator.comparing(PostDTO::getPublishTime).reversed())
+                    .collect(Collectors.toList()),
+                pageable, postRepository.countAllByTagsIsNotNull());
     }
 
     private Tag getOrBuildTag(String text) {
@@ -232,6 +218,9 @@ public class PostService {
     }
 
     private Set<Tag> getOrBuildTags(Set<String> tagRequests) {
+        if (tagRequests == null) {
+            return null;
+        }
         return tagRequests.stream()
                 .map(this::getOrBuildTag)
                 .collect(Collectors.toSet());

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 public class PostRequest {
@@ -17,7 +18,7 @@ public class PostRequest {
     @JsonProperty("type")
     private PostType type;
     @JsonProperty("publishTime")
-    private LocalDateTime publishTime;
+    private ZonedDateTime publishTime;
 
 
 }

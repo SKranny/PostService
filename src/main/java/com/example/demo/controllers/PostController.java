@@ -18,8 +18,7 @@ import security.TokenAuthentication;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -62,9 +61,9 @@ public class PostController {
             @Valid @Min(0) @RequestParam(name = "offset", defaultValue = "20", required = false) Integer offset,
             @RequestParam(name = "withFriends", defaultValue = "false", required = false) Boolean withFriends,
             @RequestParam(name = "toTime", required = false)
-                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toTime,
+                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime toTime,
             @RequestParam(name = "fromTime", required = false)
-                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromTime,
+                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fromTime,
             @RequestParam(name = "isDelete", defaultValue = "false", required = false) Boolean isDelete,
             @RequestParam(name = "tags", required = false) List<String> tags,
             @RequestParam(name = "range", required = false) String range,

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 public class PostSpecification {
@@ -13,7 +14,7 @@ public class PostSpecification {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("withFriends"), withFriends);
     }
 
-    public static Specification<Post> postedPost(LocalDateTime now) {
+    public static Specification<Post> postedPost(ZonedDateTime now) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("publishTime"), now);
     }
 
@@ -23,12 +24,12 @@ public class PostSpecification {
 
     }
 
-    public static Specification<Post> toTime(LocalDateTime toTime) {
+    public static Specification<Post> toTime(ZonedDateTime toTime) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("publishTime"), toTime);
     }
 
 
-    public static Specification<Post> fromTime(LocalDateTime fromTime) {
+    public static Specification<Post> fromTime(ZonedDateTime fromTime) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("publishTime"), fromTime));
     }
 
