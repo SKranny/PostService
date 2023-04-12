@@ -9,3 +9,10 @@ Improvements can be proposed in the [original project](https://gitlab.com/gitlab
 This template is compatible with [Auto DevOps](https://docs.gitlab.com/ee/topics/autodevops/).
 
 If Auto DevOps is not already enabled for this project, you can [turn it on](https://docs.gitlab.com/ee/topics/autodevops/#enabling-auto-devops) in the project settings.
+
+This service provides a variety of post management features such as 
+- creation of posts
+- delete posts
+- deferred creation of posts
+- management of tags
+and many others.
