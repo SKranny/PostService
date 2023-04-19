@@ -1,5 +1,5 @@
 # Java Spring project "Social networking site"
-Post-service
+### Post-service
 
 ## Description
 This service provides a variety of post management features such as 
