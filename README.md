@@ -1,4 +1,4 @@
-### Java Spring project
+# Java Spring project "Social networking site"
 Post-service
 
 ## Description
