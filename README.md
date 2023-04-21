@@ -2,12 +2,11 @@
 ### Post-service
 
 ## Description
-This service provides a variety of post management features such as 
-- creation of posts
+Post-service provides a variety of options for managing posts and tags, as well as news feeds and user posts on their pages. Post-service can provide such functionality as: 
+- create posts
 - delete posts
-- deferred creation of posts
-- management of tags
-and many others.
+- delayed post creation
+- Tag management and more.
 ## Service Technologies
 
 ## Technical Description
