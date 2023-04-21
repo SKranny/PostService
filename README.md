@@ -26,3 +26,11 @@ Post-service provides a variety of options for managing posts and tags, as well 
 ## Technical Description
 ### How to run the application on your device:
 1. (Pre-configuring the PostgreSQL database) Specify in the application.yaml file, or in the environment variables in your IDE, the required application configuration parameters to run:
+    - SERVER_PORT ()
+    - KAFKA_HOST ()
+    - DB_PASSWORD ()
+    - USER_NAME ()
+    - POST_SERVICE_DATABASE_URL ()
+    - SECRET_KEY ()
+    - EUREKA_URI ()
+2. Run the file PostApplication.java.
